@@ -164,7 +164,7 @@ jobs:
         run: |
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
           echo "Staging ${{ env.ASSET }} to S3..."
-          aws s3 cp ${ASSET} s3://pa-build-cache-dev2/${ASSET}
+          aws s3 cp ${ASSET} s3://pa-build-cache-ops/${ASSET}
         
       - name: Deploy padev (EB)
         # if: github.ref_name == github.event.repository.default_branch
@@ -173,7 +173,7 @@ jobs:
         with:
           aws-region: ${{ inputs.region }}
           app-name: ${{ env.PROJECT_NAME }}
-          s3-bucket: 'pa-build-cache-dev2'
+          s3-bucket: 'pa-build-cache-ops'
           package-name: ${{ env.PROJECT_NAME }}
           version-label: ${{ env.VER }}
 
