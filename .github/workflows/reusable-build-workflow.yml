@@ -1,0 +1,194 @@
+name: Build an SST/CDK/Docker project
+
+on:
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+    inputs:
+      job-name:
+        description: "Job Name"
+        required: true
+        type: string
+      region:
+        description: "AWS Region"
+        required: false
+        default: "us-east-2"
+        type: string
+      project-dir:
+        description: "Project Directory"
+        required: false
+        default: "."
+        type: string
+      registry-id:
+        description: "ECR Registry ID"
+        required: false
+        default: "173305588364"
+        type: string
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+env:
+  AWS_REGION: ${{ inputs.region }}
+  DOCKER_IMAGE: ${{ inputs.job-name }}
+  REGISTRY_ID: ${{ inputs.registry-id }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  REGION: ${{ inputs.region }}
+  PADEV_ROLE_ARN: "arn:aws:iam::337636387741:role/GitHubActions"
+  ECR_REPO: "${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
+
+
+  VER: ''
+  PROJECT_NAME: ''
+  has_build: 'false'
+  has_docker: 'false'
+
+jobs:
+  build-job:
+    environment: padev
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: warp-ubuntu-latest-x64-2x
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use paops
+        id: use-paops
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-session-name: pa_github_actions
+          role-to-assume: ${{ inputs.PADEV_ROLE_ARN }}
+          aws-region: ${{ inputs.AWS_REGION }}
+        
+      - name: STS GetCallerIdentity
+        shell: bash
+        run: aws sts get-caller-identity
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Make Version Tag
+        id: make-version-tag
+        uses: ./.github/actions/make-version-tag
+        with:
+          projectName: ${{ inputs.project-dir }}
+
+      - name: Set package.json Version
+        working-directory: ${{ inputs.project-dir }}
+        run: |
+          VER=`npm version  --no-git-tag-version --new-version ${{ steps.make-version-tag.outputs.version }}`
+          echo "VER=$VER" >> $GITHUB_ENV
+
+      - name: Detect Configuration
+        working-directory: ${{ inputs.project-dir }}
+        run: |
+          PROJECT_TYPE=`dirname ${{ inputs.project-dir }}`
+          PROJECT_NAME=`basename ${{ inputs.project-dir }}`
+          ASSET="${PROJECT_NAME}-${{ env.VER }}.tgz" 
+
+          echo "PROJECT_TYPE=$PROJECT_TYPE" >> $GITHUB_ENV
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+          echo "ASSET=$ASSET" >> $GITHUB_ENV
+
+      - name: Getting fresh dependencies
+        id: fresh-deps
+        working-directory: ${{ inputs.project-dir }}
+        run: |
+          rm -rf node_modules
+          npm i
+
+      - name: Build Application
+        id: build-app
+        working-directory: ${{ inputs.project-dir }}
+        run: npm run build
+
+      - name: Setup docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Use Docker ECR
+        run: aws ecr get-login-password --region ${{ inputs.region }} | docker login --username AWS --password-stdin ${{ env.ECR_REPO }}
+        
+
+      - name: Make Docker
+        working-directory: ${{ inputs.project-dir }}
+        run: |
+          REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
+          TAG="${{ env.PROJECT_NAME }}-${{ env.VER }}"
+          echo "${REG}:${TAG}"
+          docker build . --platform=linux/amd64 --tag ${REG}:${TAG}
+          docker image tag ${REG}:${TAG} ${REG}:latest
+
+      - name: Push Docker
+        if: env.has_docker == 'true'
+        working-directory: ${{ inputs.project-dir }}
+        run: |
+          REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
+          TAG="${{ steps.make-version-tag.outputs.safeName }}-${{ steps.make-version-tag.outputs.version }}"
+          docker push -a ${REG}
+
+      - name: Package Release files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+        # if: github.ref_name == github.event.repository.default_branch
+        working-directory: ${{ inputs.project-dir }}
+        id: package-release
+        run: |
+          # like yarn pack
+          [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' docker-compose.yml
+          cat docker-compose.yml
+          FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
+          tar czf ${{ env.ASSET }} $FILES
+
+      - name: Publish Release files
+        # if: github.ref_name == github.event.repository.default_branch
+        working-directory: ${{ inputs.project-dir }}
+        id: package-publish
+        run: |
+          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.tgz" 
+          HASH=$(sha256sum ${ASSET} | awk '{print $1;}')
+          aws codeartifact publish-package-version --domain privateauto --repository privateauto --region us-east-2 --domain-owner 173305588364 \
+                --format generic --namespace api --package ${PROJECT_NAME} --package-version ${{ steps.make-version-tag.outputs.version }} \
+                --asset-content ${ASSET} --asset-name ${ASSET} \
+                --asset-sha256 $HASH
+
+      - name: Stage Release files
+        # if: github.ref_name == github.event.repository.default_branch
+        working-directory: ${{ inputs.project-dir }}
+        id: package-stage
+        run: |
+          echo "Staging ${{ env.ASSET }} to S3..."
+          aws s3 cp ${{ env.ASSET }} s3://pa-build-cache-dev2/${{ env.ASSET }}
+        
+      - name: Deploy padev (EB)
+        # if: github.ref_name == github.event.repository.default_branch
+        id: deploy-padev
+        uses: ./.github/actions/deploy-eb
+        with:
+          aws-region: ${{ inputs.region }}
+          app-name: ${{ env.PROJECT_NAME }}
+          s3-bucket: 'pa-build-cache-dev2'
+          package-name: ${{ env.PROJECT_NAME }}
+          version-label: ${{ env.VER }}
+
+      - name: Send success message
+        id: send-success-message
+        if: success()
+        uses: ./.github/actions/google-chat
+        with:
+          message: "SUCCESS: padev : ${{ inputs.job-name }}  ${{ steps.make-version-tag.outputs.version }}"
+
+      - name: Send failure message
+        id: send-failure-message
+        if: failure()
+        uses: ./.github/actions/google-chat
+        with:
+          message: "FAILED: padev : ${{ inputs.job-name }}  ${{ steps.make-version-tag.outputs.version }}"

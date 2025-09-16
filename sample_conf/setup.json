@@ -1,922 +1,1256 @@
 {
-	"storage": [
-		[ "put", "users/admin", {
-			"username": "admin",
-			"password": "$2a$10$VAF.FNvz1JqhCAB5rCh9GOa965eYWH3fcgWIuQFAmsZnnVS/.ye1y",
-			"full_name": "Administrator",
-			"email": "admin@cronicle.com",
-			"active": 1,
-			"modified": 1434125333,
-			"created": 1434125333,
-			"salt": "salty",
-			"privileges": {
-				"admin": 1
-			}
-		} ],
-		[ "listCreate", "global/users", { "page_size": 100 } ],
-		[ "listPush", "global/users", { "username": "admin" } ],
-		[ "listCreate", "global/plugins", {} ],
-		[ "listPush", "global/plugins", {
-			"id": "testplug",
-			"title": "Test Plugin",
-			"enabled": 1,
-			"command": "node bin/test-plugin.js",
-			"username": "admin",
-			"modified": 1434125333,
-			"created": 1434125333,
-			"params": [
-				{ "id":"duration", "type":"text", "size":10, "title":"Test Duration (seconds)", "value": 60 },
-				{ "id":"progress", "type":"checkbox", "title":"Report Progress", "value": 1 },
-				{ "id":"burn", "type":"checkbox", "title":"Burn Memory/CPU", "value": 0 },
-				{ "id":"action", "type":"select", "title":"Simulate Action", "items":["Success","Failure","Crash","Random"], "value": "Success" },
-				{ "id":"secret", "type":"hidden", "value":"Will not be shown in Event UI" }
-			]
-		} ],
-		[ "listPush", "global/plugins", {
-			"id": "shellplug",
-			"title": "Shell Script",
-			"enabled": 1,
-			"command": "node bin/shell-plugin.js",
-			"username": "admin",
-			"uid": 1000,
-			"modified": 1434125333,
-			"created": 1434125333,
-			"params": [
-				{ "id":"script", "type":"textarea", "rows":10, "title":"Script Source", "value": "#!/usr/bin/env bash\n\n# Enter your shell script code here\n# Press F11 to toggle full screen mode\n# To get workflow's job argument refer to $JOB_ARG env variable\n\n# am I windows?\necho $PSVersionTable\n\necho \"print integer with % to report progress (e.g. 20%)\"\n sleep 2; echo \"$(date)\"; echo 10%\n sleep 2; echo \"$(date)\"; echo 40%\n sleep 2; echo \"$(date)\"; echo 90%\n sleep 2\necho '{\"perf\":{\"step3\":55,\"step2\":30,\"step1\":20}}'" },
-				{ "id":"annotate", "type":"checkbox", "title":"Add Date/Time Stamps to Log", "value": 0 },
-				{ "id":"json", "type":"checkbox", "title":"Interpret JSON in Output", "value": 0 },
-				{"type":"select","id":"lang","title":"syntax","items":["shell","powershell","javascript","python","perl","groovy","java","csharp","scala","sql","yaml","toml","dockerfile"],"value":"shell"},
-				{"type":"select","id":"theme","title":"theme","items":["default","light","gruvbox-dark","solarized light","solarized dark","darcula","ambiance","base16-dark","nord"],"value":"default"},
-				{"type":"checkbox","id":"sub_params","title":"Resolve parameters","value":0},
-				{"type":"checkbox","id":"logmemo","title":"Log Memo","value":0},
-				{"type":"filelist","id":"files","title":"File List","theme":"default", "value":0}	
-			]
-		} ],
+  "storage": [
+    [
+      "put",
+      "users/admin",
+      {
+        "username": "admin",
+        "password": "$2a$10$VAF.FNvz1JqhCAB5rCh9GOa965eYWH3fcgWIuQFAmsZnnVS/.ye1y",
+        "full_name": "Administrator",
+        "email": "admin@cronicle.com",
+        "active": 1,
+        "modified": 1434125333,
+        "created": 1434125333,
+        "salt": "salty",
+        "privileges": {
+          "admin": 1
+        }
+      }
+    ],
+    ["listCreate", "global/users", { "page_size": 100 }],
+    ["listPush", "global/users", { "username": "admin" }],
+    ["listCreate", "global/plugins", {}],
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "testplug",
+        "title": "Test Plugin",
+        "enabled": 1,
+        "command": "node bin/test-plugin.js",
+        "username": "admin",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": [
+          {
+            "id": "duration",
+            "type": "text",
+            "size": 10,
+            "title": "Test Duration (seconds)",
+            "value": 60
+          },
+          {
+            "id": "progress",
+            "type": "checkbox",
+            "title": "Report Progress",
+            "value": 1
+          },
+          {
+            "id": "burn",
+            "type": "checkbox",
+            "title": "Burn Memory/CPU",
+            "value": 0
+          },
+          {
+            "id": "action",
+            "type": "select",
+            "title": "Simulate Action",
+            "items": ["Success", "Failure", "Crash", "Random"],
+            "value": "Success"
+          },
+          {
+            "id": "secret",
+            "type": "hidden",
+            "value": "Will not be shown in Event UI"
+          }
+        ]
+      }
+    ],
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "shellplug",
+        "title": "Shell Script",
+        "enabled": 1,
+        "command": "node bin/shell-plugin.js",
+        "username": "admin",
+        "uid": 1000,
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": [
+          {
+            "id": "script",
+            "type": "textarea",
+            "rows": 10,
+            "title": "Script Source",
+            "value": "#!/usr/bin/env bash\n\n# Enter your shell script code here\n# Press F11 to toggle full screen mode\n# To get workflow's job argument refer to $JOB_ARG env variable\n\n# am I windows?\necho $PSVersionTable\n\necho \"print integer with % to report progress (e.g. 20%)\"\n sleep 2; echo \"$(date)\"; echo 10%\n sleep 2; echo \"$(date)\"; echo 40%\n sleep 2; echo \"$(date)\"; echo 90%\n sleep 2\necho '{\"perf\":{\"step3\":55,\"step2\":30,\"step1\":20}}'"
+          },
+          {
+            "id": "annotate",
+            "type": "checkbox",
+            "title": "Add Date/Time Stamps to Log",
+            "value": 0
+          },
+          {
+            "id": "json",
+            "type": "checkbox",
+            "title": "Interpret JSON in Output",
+            "value": 0
+          },
+          {
+            "type": "select",
+            "id": "lang",
+            "title": "syntax",
+            "items": [
+              "shell",
+              "powershell",
+              "javascript",
+              "python",
+              "perl",
+              "groovy",
+              "java",
+              "csharp",
+              "scala",
+              "sql",
+              "yaml",
+              "toml",
+              "dockerfile"
+            ],
+            "value": "shell"
+          },
+          {
+            "type": "select",
+            "id": "theme",
+            "title": "theme",
+            "items": [
+              "default",
+              "light",
+              "gruvbox-dark",
+              "solarized light",
+              "solarized dark",
+              "darcula",
+              "ambiance",
+              "base16-dark",
+              "nord"
+            ],
+            "value": "default"
+          },
+          {
+            "type": "checkbox",
+            "id": "sub_params",
+            "title": "Resolve parameters",
+            "value": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "logmemo",
+            "title": "Log Memo",
+            "value": 0
+          },
+          {
+            "type": "filelist",
+            "id": "files",
+            "title": "File List",
+            "theme": "default",
+            "value": 0
+          }
+        ]
+      }
+    ],
 
-		[ "listPush", "global/plugins", {
-			"id": "sshplug",
-			"title": "SSH",
-			"enabled": 1,
-			"command": "node bin/ssh-plugin.js",
-			"username": "admin",
-			"uid": "",
-			"modified": 1434125333,
-			"created": 1434125333,
-			"params": [
-				{ "id":"ssh_host", "type":"text", "size":40, "title":"HOST/URI", "value": "sftp://cronicle:Password@localhost:22" },
-				{ "id":"ssh_cmd", "type":"text", "size":40, "title":"Command", "value": "bash -" },
-				{ "id":"script", "type":"textarea", "rows":10, "title":"STDIN Script", "value": "\n\necho \"STARTED\"\n\n# set trap command for proper termination handling\necho \"trap: kill $$\"\n\nsleep 15\necho \"COMPLETED\"\n\n# to specify host use full URI (sftp://user:Password@host:port)\n# or keep that URI as env variable and specify variable name\n# keep blank or localhost to run command locally (without ssh)\n# if using ssh key\n# sftp://user@host:port?privateKey=/path/to/file&passphrase=Password)\n# you can also keep ssh key in SSH Key parameter\n# if password contains special character use URI escape characters (e.g. @ => %40)\n\n# if using with WF plugin host could be specified via Job Argument parameter\n\n# many interpreters (besides sh/bash) will support execution from stdin\n# node -\n# python -\n# pwsh -c -\n# some will need a file to be created, if so try smth like\n# cat - > /tmp/myfile && groovy myfile\n\n# This should work the same way on Windows machines too (if openssh installed)\n# powershell -\n\n# Please note that aborting SSH job won't terminate you remote command\n# You can specify termination command by printing it out with \"trap:\" prefix, e.g.\n# echo \"trap: kill $$\" or \"trap: kill -9 -$$\"" },
-				{"type":"select","id":"lang","title":"syntax","items":["shell","powershell","javascript","python","perl","groovy","java","csharp","scala","sql","yaml","dockerfile","json","props"],"value":"shell"},
-				{"type":"select","id":"theme","title":"theme","items":["default","gruvbox-dark","solarized light","solarized dark","darcula","ambiance","base16-dark","nord"],"value":"default"},
-				{ "id":"ssh_key", "type":"textarea", "rows":5, "title":"SSH Key", "value": "" },
-				{ "id":"json", "type":"checkbox", "title":"Interpret JSON in Output", "value": 0 }		
-			]
-		} ],		
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "sshplug",
+        "title": "SSH",
+        "enabled": 1,
+        "command": "node bin/ssh-plugin.js",
+        "username": "admin",
+        "uid": "",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": [
+          {
+            "id": "ssh_host",
+            "type": "text",
+            "size": 40,
+            "title": "HOST/URI",
+            "value": "sftp://cronicle:Password@localhost:22"
+          },
+          {
+            "id": "ssh_cmd",
+            "type": "text",
+            "size": 40,
+            "title": "Command",
+            "value": "bash -"
+          },
+          {
+            "id": "script",
+            "type": "textarea",
+            "rows": 10,
+            "title": "STDIN Script",
+            "value": "\n\necho \"STARTED\"\n\n# set trap command for proper termination handling\necho \"trap: kill $$\"\n\nsleep 15\necho \"COMPLETED\"\n\n# to specify host use full URI (sftp://user:Password@host:port)\n# or keep that URI as env variable and specify variable name\n# keep blank or localhost to run command locally (without ssh)\n# if using ssh key\n# sftp://user@host:port?privateKey=/path/to/file&passphrase=Password)\n# you can also keep ssh key in SSH Key parameter\n# if password contains special character use URI escape characters (e.g. @ => %40)\n\n# if using with WF plugin host could be specified via Job Argument parameter\n\n# many interpreters (besides sh/bash) will support execution from stdin\n# node -\n# python -\n# pwsh -c -\n# some will need a file to be created, if so try smth like\n# cat - > /tmp/myfile && groovy myfile\n\n# This should work the same way on Windows machines too (if openssh installed)\n# powershell -\n\n# Please note that aborting SSH job won't terminate you remote command\n# You can specify termination command by printing it out with \"trap:\" prefix, e.g.\n# echo \"trap: kill $$\" or \"trap: kill -9 -$$\""
+          },
+          {
+            "type": "select",
+            "id": "lang",
+            "title": "syntax",
+            "items": [
+              "shell",
+              "powershell",
+              "javascript",
+              "python",
+              "perl",
+              "groovy",
+              "java",
+              "csharp",
+              "scala",
+              "sql",
+              "yaml",
+              "dockerfile",
+              "json",
+              "props"
+            ],
+            "value": "shell"
+          },
+          {
+            "type": "select",
+            "id": "theme",
+            "title": "theme",
+            "items": [
+              "default",
+              "gruvbox-dark",
+              "solarized light",
+              "solarized dark",
+              "darcula",
+              "ambiance",
+              "base16-dark",
+              "nord"
+            ],
+            "value": "default"
+          },
+          {
+            "id": "ssh_key",
+            "type": "textarea",
+            "rows": 5,
+            "title": "SSH Key",
+            "value": ""
+          },
+          {
+            "id": "json",
+            "type": "checkbox",
+            "title": "Interpret JSON in Output",
+            "value": 0
+          }
+        ]
+      }
+    ],
 
-		[ "listPush", "global/plugins", {
-			"id": "sshxplug",
-			"title": "SSHX",
-			"enabled": 1,
-			"command": "node bin/sshx-plugin.js",
-			"username": "admin",
-			"uid": "",
-			"modified": 1434125333,
-			"created": 1434125333,
-			"ipc": true,
-			"params": [
-				{ "id":"ssh_host", "type":"text", "size":40, "title":"SSH Host", "value": "ssh://cronicle:Password@localhost:22" },
-				{ "id":"kill_cmd", "type":"text", "size":40, "title":"Kill Command", "value": "pkill -s $$" },
-				{ "id":"script", "type":"textarea", "rows":10, "title":"Script", "value": "\n#!/bin/sh\n\necho \"Running SSHX job on $HOSTNAME\"\n\nsleep 10\n\n# Specify conneciton info using URI format:\n# [ssh://]user[:Password]@host[:port]?[privateKey=/path/to/file&passphrase=Password]\n# URI can be passed directly or as a reference to environment variable\n# If passing password via URI, you'd need to encode special characters (e.g. @ => %40)\n# You can also set SSH_KEY/SSH_PASSWORD/SSH_PASSPHRASE as variables in event/plugin secrets\n\n# If no SSH Host specified on event parameters, it can be resolved from WF argument\n\n# Kill Command parameter is used to properly handle job abortion\n# Default command is [pkill -S $$]\n# $$ is refering to PID of your script parent process (bootstrap script)\n\n# To pass variables other then JOB_ / ARG*, use SSH_ prefix on variable name\n# If this event is chained by other job, you can access chain data using CHAIN_DATA variable\n\n" },
-				{ "id":"json", "type":"checkbox", "title":"Interpret JSON in Output", "value": 0 },
-				{ "id":"trunc_var", "type":"checkbox", "title":"Truncate Environment Variable Prefix", "value": 0 },
-				{ "type": "checkbox", "id": "annotate", "title": "Add Date/Time Stamps to Log",	"value": 0 },
-				{ "type":"select","id":"target_os","title":"Target OS","items":["linux","darwin","windows"],"value":"linux"},
-				{ "type":"select","id":"lang","title":"syntax","items":["shell","powershell","javascript","python","perl","groovy","java","csharp","scala","sql","yaml","dockerfile","json","props"],"value":"shell"},
-				{ "type":"select","id":"theme","title":"theme","items":["default","gruvbox-dark","solarized light","solarized dark","darcula","ambiance","base16-dark","nord"],"value":"default"}
-			]
-		} ],
-		
-		[ "listPush", "global/plugins", {
-			"id": "dockerplug",
-			"title": "Docker",
-			"enabled": 1,
-			"command": "node bin/docker-plugin.js",
-			"username": "admin",
-			"uid": "",
-			"modified": 1434125333,
-			"created": 1434125333,
-			"ipc": true,
-			"params": [
-				{ "id":"docker_host", "type":"text", "size":40, "title":"Docker Host", "value": "" },
-				{ "id":"image", "type":"text", "size":40, "title":"Image", "value": "alpine" },
-				{ "id":"command", "type":"text", "size":40, "title":"Command", "value": "" },
-				{ "id":"script", "type":"textarea", "rows":10, "title":"Script", "value": "\n#!/bin/sh\n\necho \"Running Docker job on $HOSTNAME\"\n\ncat /etc/os-release\n\nls -lah chain_data || echo \"no chain data\"\n\n# If Docker Host is not specified, docker socket will be used\n# To access remote docker machine via ssh (on top of socket) specify DH as:\n# ssh://user[:password]@host[:port]\n# To specify ssh credentials you can also use SSH_PASSWORD/SSH_KEY env varaibles\n# To access remote docker instance with exposed http:\n# http://dockerhost:2375  (there is no auth options for that at this point)\n# To specify image registry credentials use DOCKER_USER, DOCKER_PASSWORD variables\n# All credential variables can be set via event/plugin secrets\n\n# To specify volumes to be mount, list the volumes separated by comma:\n# /host/path1:/container/path1:rw,/host/path2:/container/path2,named_volume:/container/named_volume\n# To delete named volumes when the container is destroyed, untick \"Keep Named Volumes\".\n\n# This script will be used as an entrypoint on the container (mounted as /cronicle.sh by default).\n# To use original entrypoint check corresponding checkbox below,\n#  and use command parameter above to pass argument to it\n# If this job is chained by other event, chain data will be mounted to the container\n#   as chain_data file \n\n# In order to pass variables to container (other than JOB_ and ARG*) it should start with DOCKER_\n\n# If job is aborted \"docker stop\" is invoked (SIGTERM), docker will send SIGKILL after some time\n# Try to handle SIGTERM in your script for proper shutdown on abortion\n"},
-				{ "id":"entrypoint_path", "type":"text", "size":40, "title":"Mount As", "value": "" },
-				{ "id":"volumes", "type":"text", "size":100, "title":"Volumes", "value": ""},
-				{ "id":"network", "type":"text", "size":20, "title":"Network", "value": "" },
-				{ "id":"keep_entrypoint", "type":"checkbox", "title":"Keep Original Entrypoint", "value": 0 },
-				{ "id":"pull_image", "type":"checkbox", "title":"Pull Image", "value": 1 },
-				{ "id":"keep_container", "type":"checkbox", "title":"Keep Container", "value": 0 },
-				{ "id":"keep_named_volumes", "type":"checkbox", "title":"Keep Named Volumes", "value": 1 },
-				{ "id":"json", "type":"checkbox", "title":"Interpret JSON in Output", "value": 0 },
-				{ "id":"trunc_var", "type":"checkbox", "title":"Truncate Environment Variable Prefix", "value": 0 },
-				{"type":"select","id":"lang","title":"syntax","items":["shell","powershell","javascript","python","perl","groovy","java","csharp","scala","sql","yaml","dockerfile","json","props"],"value":"shell"},
-				{"type":"select","id":"theme","title":"theme","items":["default","gruvbox-dark","solarized light","solarized dark","darcula","ambiance","base16-dark","nord"],"value":"default"},
-				{"type":"filelist","id":"files","title":"File List","theme":"default", "value":0}
-			]
-		} ],
-[
-	"listPush",
-	"global/plugins",
-	{
-		"params": [
-			{
-				"type": "text",
-				"id": "namespace",
-				"title": "Namespace",
-				"size": 20,
-				"value": "default"
-			},
-			{
-				"type": "text",
-				"id": "image",
-				"title": "Image",
-				"size": 20,
-				"value": "alpine"
-			},
-			{
-				"type": "text",
-				"id": "prefix",
-				"title": "Pod prefix",
-				"size": 20,
-				"value": "cronicle-"
-			},
-			{
-				"type": "textarea",
-				"id": "script",
-				"title": "Script",
-				"rows": 15,
-				"value": "#!/bin/sh\n\necho '| '\necho -e '| \\e[1mHello from Kubernetes!\\e[0m' \necho '| '; sleep 2\necho \"| This script is executing in temporary Pod [$HOSTNAME] using [$IMAGE] image\" ; \necho '| Pod will be deleted upon job completion (unless [Keep Pod] option used)'\nsleep 1; echo '| '\necho '| To hide INFO message uncheck [Verbose] checkbox'\nsleep 1; echo '| '\necho '| Like in a shell plugin, you can use memo, progress and json messages'\necho '#TEST MEMO#'\necho '10%'\nsleep 1; echo '| '; echo '50%'\necho '| To pass env variables/secrets to Pod, add prefix KUBE_ to it'\necho '| It can be truncated (in pod runtime) by checking [Truncate variable prefix] option'\nsleep 1; echo '| '\necho '| If not provided, default kube config will be used (from .kube/config file or pod svc account)'\necho '| To specify custom config, add multiline KUBE_CONFIG secret with your configuraiton yaml'\necho '| For test purposes you can use [Kube Config] parameter'\nsleep 1; echo '| '; echo '70%'\necho '| You can execute this script as kubernetes job (vs Pod) by checking [Run as Job] parameter'\necho '| In this case cronicle will just watch for job status updates, and optionally print log tail at the end'\necho '| Such job will be removed after TTL expiration by Kubernetes, cronicle will only delete job if it gets aborted'\nsleep 1; echo '| '; echo '80%'\necho '| If you want cronicle just to trigger Pod/Job and exit - use [Detach] checkbox'\necho '| To mount pvc as data directory you can set parameter [PVC mount] as pvc_name:/data/dir, or just pvc_name (will be mounted as /data)'\nsleep 1; echo '| '; echo '90%'\necho '| Cronicle will attach app=cronicle-job label to pods/jobs it creates'\necho '| It also add event, event_title and category labels'\necho '| It can be used later to examine cronicle related object using kubectl, e.g.'\necho '| kubectl get pods -l app=cronicle-job'\necho '| kubectl delete jobs -l event_title=myTestJob'\necho '| kubectl get pods -l category=General'\necho '| '\nsleep 1"
-			},
-			{
-				"type": "select",
-				"id": "theme",
-				"title": "theme",
-				"items": [
-					"default",
-					"gruvbox-dark",
-					"solarized light",
-					"solarized dark",
-					"darcula",
-					"ambiance",
-					"base16-dark",
-					"nord"
-				],
-				"value": "default"
-			},
-			{
-				"type": "select",
-				"id": "lang",
-				"title": "Syntax",
-				"items": [
-					"shell",
-					"powershell",
-					"javascript",
-					"python",
-					"perl",
-					"groovy",
-					"java",
-					"csharp",
-					"scala",
-					"sql",
-					"yaml",
-					"dockerfile",
-					"json",
-					"props"
-				],
-				"value": "shell"
-			},
-			{
-				"type": "checkbox",
-				"id": "json",
-				"title": "Interpret JSON in Output",
-				"value": 0
-			},
-			{
-				"type": "checkbox",
-				"id": "trunc_var",
-				"title": "Truncate variable prefix (KUBE_)",
-				"value": 0
-			},
-			{
-				"type": "checkbox",
-				"id": "verbose",
-				"title": "Verbose",
-				"value": 1
-			},
-			{
-				"type": "checkbox",
-				"id": "keep_pod",
-				"title": "Keep pod",
-				"value": 0
-			},
-			{
-				"type": "select",
-				"id": "restart_policy",
-				"title": "Restart Policy",
-				"items": [
-					"Never",
-					"OnFailure",
-					"Always"
-				],
-				"value": "Never"
-			},
-			{
-				"type": "select",
-				"id": "image_pull_policy",
-				"title": "Image Pull Policy",
-				"items": [
-					"Always",
-					"IfNotPresent",
-					"Never"
-				],
-				"value": "Always"
-			},
-			{
-				"type": "checkbox",
-				"id": "detach",
-				"title": "Detach",
-				"value": 0
-			},
-			{
-				"type": "text",
-				"id": "svc_account",
-				"title": "Service Account",
-				"size": 20,
-				"value": ""
-			},
-			{
-				"type": "text",
-				"id": "pvc",
-				"title": "PVC mount",
-				"size": 20,
-				"value": ""
-			},
-			{
-				"type": "text",
-				"id": "mem_limit",
-				"title": "Memory Limit",
-				"size": 20,
-				"value": "1Gi"
-			},
-			{
-				"type": "text",
-				"id": "cpu_limit",
-				"title": "CPU Limit",
-				"size": 20,
-				"value": "1000m"
-			},
-			{
-				"type": "checkbox",
-				"id": "kube_job",
-				"title": "Run as kubernetes job",
-				"value": 0
-			},
-			{
-				"type": "select",
-				"id": "kube_job_backoff",
-				"title": "Job Backoff limit",
-				"items": [
-					"0",
-					"1",
-					"2",
-					"3",
-					"4",
-					"5",
-					"6",
-					"7",
-					"8",
-					"9",
-					"10",
-					"11",
-					"12",
-					"13",
-					"14",
-					"15",
-					"16"
-				],
-				"value": "0"
-			},
-			{
-				"type": "text",
-				"id": "kube_job_ttl",
-				"title": "Job TTL (seconds)",
-				"size": 4,
-				"value": "3600"
-			},
-			{
-				"type": "select",
-				"id": "log_tail",
-				"title": "Job log tail size",
-				"items": [
-					"0",
-					"10",
-					"20",
-					"40",
-					"80",
-					"200",
-					"400",
-					"1000"
-				],
-				"value": "20"
-			},
-			{
-				"type": "textarea",
-				"id": "config",
-				"title": "Kube Config",
-				"rows": 5,
-				"value": ""
-			}
-		],
-		"title": "Kube-Run",
-		"id": "kuberun",
-		"command": "node bin/kube-plugin.js",
-		"username": "admin",
-		"enabled": 1,
-		"ipc": 1,
-		"wf": 0,
-		"stdin": 0,
-		"modified": 1434125333,
-		"created": 1434125333,
-		"uid": "",
-		"gid": "",
-		"cwd": ""
-	}
-],
-[
-	"listPush",
-	"global/plugins",
-	{
-		"params": [
-			{
-				"type": "textarea",
-				"id": "manifest",
-				"title": "Pod Manifest",
-				"rows": 15,
-				"value": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: cronicle\n  namespace: default\n  labels:\n    app: cronicle-job\nspec:\n  restartPolicy: Never\n  containers:\n  - name: cronicle\n    image: alpine\n    env:\n    - name: FOO\n      value: \"BAR\"\n    imagePullPolicy: IfNotPresent\n    terminationGracePeriodSeconds: 10  \n    resources:\n      requests:\n        memory: \"256Mi\"\n        cpu: \"250m\"\n      limits:\n        memory: \"512Mi\"\n        cpu: \"500m\"\n  #   volumeMounts:\n  #   - name: data\n  #     mountPath: /data\n  # volumes:\n  # - name: data\n  #   emptyDir: {}"
-			},
-			{
-				"type": "checkbox",
-				"id": "custom_cmd",
-				"title": "Allow custom command",
-				"value": 0
-			},
-			{
-				"type": "textarea",
-				"id": "script",
-				"title": "Script",
-				"rows": 15,
-				"value": "#!/bin/sh\n\necho \"|\"\necho \"| Hello from Kubernetes!\"\nsleep 1\n\necho \"| This plugin works the same way as Kube-Run plugin,\"\necho \"| just let you use custom Pod or Job manifest\"\necho \"| Cronicle will add custom command, some extra variables/labels and prefixes jobId to pod name\"\nsleep 1\n\necho \"|\"\necho \"| Event script will be used to generate container command\"\necho \"| To keep command from manifest, check [Allow custom command] box\"\necho \"|\"\nsleep 1"
-			},
-			{
-				"type": "select",
-				"id": "theme",
-				"title": "theme",
-				"items": [
-					"default",
-					"gruvbox-dark",
-					"solarized light",
-					"solarized dark",
-					"darcula",
-					"ambiance",
-					"base16-dark",
-					"nord"
-				],
-				"value": "default"
-			},
-			{
-				"type": "select",
-				"id": "lang",
-				"title": "Syntax",
-				"items": [
-					"shell",
-					"powershell",
-					"javascript",
-					"python",
-					"perl",
-					"groovy",
-					"java",
-					"csharp",
-					"scala",
-					"sql",
-					"yaml",
-					"dockerfile",
-					"json",
-					"props"
-				],
-				"value": "shell"
-			},
-			{
-				"type": "checkbox",
-				"id": "json",
-				"title": "Interpret JSON in Output",
-				"value": 0
-			},
-			{
-				"type": "checkbox",
-				"id": "trunc_var",
-				"title": "Truncate variable prefix (KUBE_)",
-				"value": 0
-			},
-			{
-				"type": "checkbox",
-				"id": "verbose",
-				"title": "Verbose",
-				"value": 1
-			},
-			{
-				"type": "checkbox",
-				"id": "keep_pod",
-				"title": "Keep pod",
-				"value": 0
-			},
-			{
-				"type": "checkbox",
-				"id": "detach",
-				"title": "Detach",
-				"value": 0
-			},
-			{
-				"type": "select",
-				"id": "log_tail",
-				"title": "Job log tail size",
-				"items": [
-					"0",
-					"10",
-					"20",
-					"40",
-					"80",
-					"200",
-					"400",
-					"1000"
-				],
-				"value": "40"
-			},
-			{
-				"type": "textarea",
-				"id": "config",
-				"title": "Kube Config",
-				"rows": 5,
-				"value": ""
-			}
-		],
-		"title": "Kube-Yaml",
-		"id": "kubeyaml",
-		"command": "node bin/kube-plugin.js manifest",
-		"username": "admin",
-		"enabled": 1,
-		"ipc": 1,
-		"wf": 0,
-		"stdin": 0,
-		"modified": 1434125333,
-		"created": 1434125333,
-		"uid": "",
-		"gid": "",
-		"cwd": ""
-	}
-],
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "sshxplug",
+        "title": "SSHX",
+        "enabled": 1,
+        "command": "node bin/sshx-plugin.js",
+        "username": "admin",
+        "uid": "",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "ipc": true,
+        "params": [
+          {
+            "id": "ssh_host",
+            "type": "text",
+            "size": 40,
+            "title": "SSH Host",
+            "value": "ssh://cronicle:Password@localhost:22"
+          },
+          {
+            "id": "kill_cmd",
+            "type": "text",
+            "size": 40,
+            "title": "Kill Command",
+            "value": "pkill -s $$"
+          },
+          {
+            "id": "script",
+            "type": "textarea",
+            "rows": 10,
+            "title": "Script",
+            "value": "\n#!/bin/sh\n\necho \"Running SSHX job on $HOSTNAME\"\n\nsleep 10\n\n# Specify conneciton info using URI format:\n# [ssh://]user[:Password]@host[:port]?[privateKey=/path/to/file&passphrase=Password]\n# URI can be passed directly or as a reference to environment variable\n# If passing password via URI, you'd need to encode special characters (e.g. @ => %40)\n# You can also set SSH_KEY/SSH_PASSWORD/SSH_PASSPHRASE as variables in event/plugin secrets\n\n# If no SSH Host specified on event parameters, it can be resolved from WF argument\n\n# Kill Command parameter is used to properly handle job abortion\n# Default command is [pkill -S $$]\n# $$ is refering to PID of your script parent process (bootstrap script)\n\n# To pass variables other then JOB_ / ARG*, use SSH_ prefix on variable name\n# If this event is chained by other job, you can access chain data using CHAIN_DATA variable\n\n"
+          },
+          {
+            "id": "json",
+            "type": "checkbox",
+            "title": "Interpret JSON in Output",
+            "value": 0
+          },
+          {
+            "id": "trunc_var",
+            "type": "checkbox",
+            "title": "Truncate Environment Variable Prefix",
+            "value": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "annotate",
+            "title": "Add Date/Time Stamps to Log",
+            "value": 0
+          },
+          {
+            "type": "select",
+            "id": "target_os",
+            "title": "Target OS",
+            "items": ["linux", "darwin", "windows"],
+            "value": "linux"
+          },
+          {
+            "type": "select",
+            "id": "lang",
+            "title": "syntax",
+            "items": [
+              "shell",
+              "powershell",
+              "javascript",
+              "python",
+              "perl",
+              "groovy",
+              "java",
+              "csharp",
+              "scala",
+              "sql",
+              "yaml",
+              "dockerfile",
+              "json",
+              "props"
+            ],
+            "value": "shell"
+          },
+          {
+            "type": "select",
+            "id": "theme",
+            "title": "theme",
+            "items": [
+              "default",
+              "gruvbox-dark",
+              "solarized light",
+              "solarized dark",
+              "darcula",
+              "ambiance",
+              "base16-dark",
+              "nord"
+            ],
+            "value": "default"
+          }
+        ]
+      }
+    ],
 
-		[ "listPush", "global/plugins", {
-			"params": [
-			  { "type": "select", "id": "list_object", "title": "Workload Type", "items": ["Pods", "Jobs", "Deployments", "StatefulSets", "DaemonSets"], "value": "Pods" },
-			  { "type": "text", "id": "namespace", "title": "Namespace", "size": 20, "value": "default" },
-			  { "type": "select", "id": "list_limit", "title": "Limit", "items": ["10", "50", "100", "150", "200"], "value": "50" },
-			  { "type": "textarea", "id": "config", "title": "Kube Config", "rows": 5, "value": "" }
-			],
-			"title": "Kube-List",
-			"id": "kubelist",
-			"command": "node bin/kube-plugin.js list",
-			"username": "admin",
-			"enabled": 1,
-			"ipc": 1,
-			"wf": 0,
-			"stdin": 0,
-			"modified": 1434125333,
-			"created": 1434125333,
-			"uid": "",
-			"gid": "",
-			"cwd": ""
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "dockerplug",
+        "title": "Docker",
+        "enabled": 1,
+        "command": "node bin/docker-plugin.js",
+        "username": "admin",
+        "uid": "",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "ipc": true,
+        "params": [
+          {
+            "id": "docker_host",
+            "type": "text",
+            "size": 40,
+            "title": "Docker Host",
+            "value": ""
+          },
+          {
+            "id": "image",
+            "type": "text",
+            "size": 40,
+            "title": "Image",
+            "value": "alpine"
+          },
+          {
+            "id": "command",
+            "type": "text",
+            "size": 40,
+            "title": "Command",
+            "value": ""
+          },
+          {
+            "id": "script",
+            "type": "textarea",
+            "rows": 10,
+            "title": "Script",
+            "value": "\n#!/bin/sh\n\necho \"Running Docker job on $HOSTNAME\"\n\ncat /etc/os-release\n\nls -lah chain_data || echo \"no chain data\"\n\n# If Docker Host is not specified, docker socket will be used\n# To access remote docker machine via ssh (on top of socket) specify DH as:\n# ssh://user[:password]@host[:port]\n# To specify ssh credentials you can also use SSH_PASSWORD/SSH_KEY env varaibles\n# To access remote docker instance with exposed http:\n# http://dockerhost:2375  (there is no auth options for that at this point)\n# To specify image registry credentials use DOCKER_USER, DOCKER_PASSWORD variables\n# All credential variables can be set via event/plugin secrets\n\n# To specify volumes to be mount, list the volumes separated by comma:\n# /host/path1:/container/path1:rw,/host/path2:/container/path2,named_volume:/container/named_volume\n# To delete named volumes when the container is destroyed, untick \"Keep Named Volumes\".\n\n# This script will be used as an entrypoint on the container (mounted as /cronicle.sh by default).\n# To use original entrypoint check corresponding checkbox below,\n#  and use command parameter above to pass argument to it\n# If this job is chained by other event, chain data will be mounted to the container\n#   as chain_data file \n\n# In order to pass variables to container (other than JOB_ and ARG*) it should start with DOCKER_\n\n# If job is aborted \"docker stop\" is invoked (SIGTERM), docker will send SIGKILL after some time\n# Try to handle SIGTERM in your script for proper shutdown on abortion\n"
+          },
+          {
+            "id": "entrypoint_path",
+            "type": "text",
+            "size": 40,
+            "title": "Mount As",
+            "value": ""
+          },
+          {
+            "id": "volumes",
+            "type": "text",
+            "size": 100,
+            "title": "Volumes",
+            "value": ""
+          },
+          {
+            "id": "network",
+            "type": "text",
+            "size": 20,
+            "title": "Network",
+            "value": ""
+          },
+          {
+            "id": "keep_entrypoint",
+            "type": "checkbox",
+            "title": "Keep Original Entrypoint",
+            "value": 0
+          },
+          {
+            "id": "pull_image",
+            "type": "checkbox",
+            "title": "Pull Image",
+            "value": 1
+          },
+          {
+            "id": "keep_container",
+            "type": "checkbox",
+            "title": "Keep Container",
+            "value": 0
+          },
+          {
+            "id": "keep_named_volumes",
+            "type": "checkbox",
+            "title": "Keep Named Volumes",
+            "value": 1
+          },
+          {
+            "id": "json",
+            "type": "checkbox",
+            "title": "Interpret JSON in Output",
+            "value": 0
+          },
+          {
+            "id": "trunc_var",
+            "type": "checkbox",
+            "title": "Truncate Environment Variable Prefix",
+            "value": 0
+          },
+          {
+            "type": "select",
+            "id": "lang",
+            "title": "syntax",
+            "items": [
+              "shell",
+              "powershell",
+              "javascript",
+              "python",
+              "perl",
+              "groovy",
+              "java",
+              "csharp",
+              "scala",
+              "sql",
+              "yaml",
+              "dockerfile",
+              "json",
+              "props"
+            ],
+            "value": "shell"
+          },
+          {
+            "type": "select",
+            "id": "theme",
+            "title": "theme",
+            "items": [
+              "default",
+              "gruvbox-dark",
+              "solarized light",
+              "solarized dark",
+              "darcula",
+              "ambiance",
+              "base16-dark",
+              "nord"
+            ],
+            "value": "default"
+          },
+          {
+            "type": "filelist",
+            "id": "files",
+            "title": "File List",
+            "theme": "default",
+            "value": 0
+          }
+        ]
+      }
+    ],
+
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "stdin",
+        "title": "stdin",
+        "enabled": 1,
+        "command": "node -",
+        "username": "admin",
+        "uid": 1000,
+        "stdin": 1,
+        "script": "\nlet prefix = process.env['PREFIX'] || 'JOB_'\n\nlet env = Object.entries(process.env)\n  .filter(e => e[0].startsWith(prefix))\n  .map(e => ({name: e[0], value: e[1].substring(0,80)}))\n  \nconsole.table(env)\n\nconsole.log(JSON.stringify({complete:1, code:0}))",
+        "ipc": 0,
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": [
+          {
+            "id": "prefix",
+            "type": "text",
+            "size": 20,
+            "title": "Env Prefix",
+            "value": "JOB_"
+          }
+        ],
+        "optional": true
+      }
+    ],
+
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "params": [
+          {
+            "type": "select",
+            "id": "wf_concur",
+            "title": "Concurrency level",
+            "items": [
+              "(sync)",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16"
+            ],
+            "value": "(sync)"
+          },
+
+          {
+            "type": "select",
+            "id": "wf_maxerr",
+            "title": "Max Errors",
+            "items": [
+              "(None)",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10"
+            ],
+            "value": "(None)"
+          },
+          {
+            "type": "checkbox",
+            "id": "wf_strict",
+            "title": "Report error on any job failure",
+            "value": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "wf_ignore_ssl",
+            "title": "Skip SSL check",
+            "value": 0
+          },
+          { "type": "eventlist", "id": "wf_events", "title": "Workflow Events" }
+        ],
+        "enabled": 1,
+        "title": "Workflow",
+        "command": "node bin/workflow.js",
+        "cwd": "",
+        "uid": "",
+        "secret": "",
+        "id": "workflow",
+        "username": "admin",
+        "modified": 1608659489,
+        "created": 1608325957
+      }
+    ],
+
+    [
+      "listPush",
+      "global/plugins",
+      {
+        "id": "urlplug",
+        "title": "HTTP Request",
+        "enabled": 1,
+        "command": "node bin/url-plugin.js",
+        "username": "admin",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": [
+          {
+            "type": "select",
+            "id": "method",
+            "title": "Method",
+            "items": ["GET", "HEAD", "POST"],
+            "value": "GET"
+          },
+          {
+            "type": "textarea",
+            "id": "url",
+            "title": "URL",
+            "rows": 3,
+            "value": "http://"
+          },
+          {
+            "type": "textarea",
+            "id": "headers",
+            "title": "Request Headers",
+            "rows": 4,
+            "value": "User-Agent: Cronicle/1.0"
+          },
+          {
+            "type": "textarea",
+            "id": "data",
+            "title": "POST Data",
+            "rows": 4,
+            "value": ""
+          },
+          {
+            "type": "text",
+            "id": "timeout",
+            "title": "Timeout (Seconds)",
+            "size": 5,
+            "value": "30"
+          },
+          {
+            "type": "checkbox",
+            "id": "follow",
+            "title": "Follow Redirects",
+            "value": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "ssl_cert_bypass",
+            "title": "SSL Cert Bypass",
+            "value": 0
+          },
+          {
+            "type": "checkbox",
+            "id": "parse_auth",
+            "title": "Parse AUTH variable/secret as header",
+            "value": 1
+          },
+          {
+            "type": "text",
+            "id": "success_match",
+            "title": "Success Match",
+            "size": 20,
+            "value": ""
+          },
+          {
+            "type": "text",
+            "id": "error_match",
+            "title": "Error Match",
+            "size": 20,
+            "value": ""
+          }
+        ]
+      }
+    ],
+
+	[
+		"listPush",
+		"global/conf_keys",
+		{
+		  "id": "mongosh",
+		  "title": "MongoDB (mongosh)",
+		  "enabled": 1,
+		  "command": "node bin/mongosh-plugin.js",
+		  "username": "admin",
+		  "modified": 1434125333,
+		  "created": 1434125333,
+		  "params": {
+			"environment": {
+			  "title": "Environment",
+			  "type": "select",
+			  "items": ["padev", "privateauto"],
+			  "default": "padev",
+			  "required": 1
+			},
+			"inline_script": {
+			  "title": "Inline Script",
+			  "type": "textarea",
+			  "rows": 10
+			},
+			"extra_args": {
+			  "title": "Extra mongosh args",
+			  "type": "text"
+			},
+			"quiet": {
+			  "title": "Quiet output",
+			  "type": "checkbox",
+			  "default": 0
+			}
 		  }
+		}
+	  ],
 		  
-	    ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "batch-runner",
+        "title": "Batch Runner",
+        "enabled": 1,
+        "command": "node bin/batch-runner-plugin.js",
+        "username": "admin",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": {
+          "name": { "title": "Job Name", "type": "text", "required": 1 },
+          "version": { "title": "Version", "type": "text", "required": 1 },
+          "environment": {
+            "title": "Environment",
+            "type": "select",
+            "items": ["padev", "privateauto"],
+            "default": "padev",
+            "required": 1
+          },
+          "command": {
+            "title": "Command",
+            "type": "text",
+            "multi": 1,
+            "required": 1
+          }
+        }
+      }
+    ],
 
-		[ "listPush", "global/plugins", {
-			"id": "stdin",
-			"title": "stdin",
-			"enabled": 1,
-			"command": "node -",
-			"username": "admin",
-			"uid": 1000,
-			"stdin": 1,
-			"script": "\nlet prefix = process.env['PREFIX'] || 'JOB_'\n\nlet env = Object.entries(process.env)\n  .filter(e => e[0].startsWith(prefix))\n  .map(e => ({name: e[0], value: e[1].substring(0,80)}))\n  \nconsole.table(env)\n\nconsole.log(JSON.stringify({complete:1, code:0}))",
-			"ipc": 0,
-			"modified": 1434125333,
-			"created": 1434125333,
-			"params": [
-				{ "id":"prefix", "type":"text", "size":20, "title":"Env Prefix", "value": "JOB_" }					
-			],
-			"optional": true
-		} ],
+    ["listCreate", "global/categories", {}],
+    [
+      "listPush",
+      "global/categories",
+      {
+        "id": "general",
+        "title": "General",
+        "enabled": 1,
+        "username": "admin",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "description": "For events that don't fit anywhere else.",
+        "gcolor": "#3498DB",
+        "max_children": 0
+      }
+    ],
 
-		[ "listPush", "global/plugins", {
-			"params": [
+    ["listCreate", "global/secrets", {}],
+    [
+      "listPush",
+      "global/secrets",
+      {
+        "id": "globalenv",
+        "encrypted": true,
+        "target": null,
+        "modified": 1434125333,
+        "created": 1434125333,
+        "form": "props"
+      }
+    ],
 
-				{
-					"type": "select",
-					"id": "wf_concur",
-					"title": "Concurrency level",
-					"items": [
-						"(sync)",
-						"2",
-						"3",
-						"4",
-						"5",
-						"6",
-						"7",
-						"8",
-						"9",
-						"10",
-						"11",
-						"12",
-						"13",
-						"14",
-						"15",
-						"16"
-					],
-					"value": "(sync)"
-				},
+    ["listCreate", "global/server_groups", {}],
+    [
+      "listPush",
+      "global/server_groups",
+      {
+        "id": "maingrp",
+        "title": "Manager Group",
+        "regexp": "_HOSTNAME_",
+        "manager": 1
+      }
+    ],
+    [
+      "listPush",
+      "global/server_groups",
+      {
+        "id": "workergrp",
+        "title": "Workers",
+        "regexp": "worker",
+        "manager": 0
+      }
+    ],
+    [
+      "listPush",
+      "global/server_groups",
+      {
+        "id": "managergrp",
+        "title": "Managers",
+        "regexp": "manager",
+        "manager": 1
+      }
+    ],
+    [
+      "listPush",
+      "global/server_groups",
+      {
+        "id": "allgrp",
+        "title": "All Servers",
+        "regexp": ".+",
+        "manager": 0
+      }
+    ],
+    ["listCreate", "global/servers", {}],
+    [
+      "listPush",
+      "global/servers",
+      {
+        "hostname": "_HOSTNAME_",
+        "ip": "_IP_"
+      }
+    ],
+    ["listCreate", "global/schedule", {}],
+    ["listCreate", "global/api_keys", {}],
+    ["listCreate", "global/conf_keys", {}],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "base_app_url",
+        "title": "base_app_url",
+        "key": "http://localhost:3012",
+        "description": "overrides app url displayed in notifications",
+        "optional": true
+      }
+    ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "ad_domain",
+        "title": "ad_domain",
+        "key": "corp.cronicle.com",
+        "description": "default AD domain for external auth. You can also prepend domain to the username (e.g. user@domain.com)",
+        "optional": true
+      }
+    ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "smtp_hostname",
+        "title": "smtp_hostname",
+        "key": "mailrelay.cronicle.com",
+        "description": "SMTP server (port 25 is used default)",
+        "optional": true
+      }
+    ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "email_from",
+        "title": "email_from",
+        "key": "admin@cronicle.com",
+        "description": "Notification sender",
+        "optional": true
+      }
+    ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "admin_web_hook",
+        "title": "admin_web_hook",
+        "key": "",
+        "description": "Webhook for activity log notifications. Uses slack markdown.\nTip: use cronicle run api to handle notification with custom event",
+        "optional": true
+      }
+    ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "custom_live_log_socket_url",
+        "title": "custom_live_log_socket_url",
+        "key": "http://localhost:3012",
+        "description": "!this requires browser page refresh\noverrides the host for live log connection. On multinode cluster this can be assigned to each node, e.g. \ncustom_live_log_socket_url.manager\ncustom_live_log_socket_url.worker1\nCan specify custom port too. This is useful if using reverse proxy or docker/swarm",
+        "optional": true
+      }
+    ],
 
-				{
-					"type": "select",
-					"id": "wf_maxerr",
-					"title": "Max Errors",
-					"items": [
-						"(None)",
-						"1",
-						"2",
-						"3",
-						"4",
-						"5",
-						"6",
-						"7",
-						"8",
-						"9",
-						"10"
-					],
-					"value": "(None)"
-				},
-				{ "type":"checkbox", "id":"wf_strict", "title":"Report error on any job failure", "value":0 },
-				{ "type":"checkbox", "id":"wf_ignore_ssl", "title":"Skip SSL check", "value":0 },
-				{ "type": "eventlist", "id": "wf_events", "title": "Workflow Events"}
-			],
-			"enabled": 1,
-			"title": "Workflow",
-			"command": "node bin/workflow.js",
-			"cwd": "",
-			"uid": "",
-			"secret": "",
-			"id": "workflow",
-			"username": "admin",
-			"modified": 1608659489,
-			"created": 1608325957
-		} ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hook_text_templates_job_complete",
+        "title": "web_hook_text_templates.job_complete",
+        "key": "✔️ *[event_title]* completed successfully on [hostname] <[job_details_url] | More details>",
+        "description": "Success notification (slack markdown by default)"
+      }
+    ],
 
-		[ "listPush", "global/plugins", {
-			"id": "urlplug",
-			"title": "HTTP Request",
-			"enabled": 1,
-			"command": "node bin/url-plugin.js",
-			"username": "admin",
-			"modified": 1434125333,
-			"created": 1434125333,
-			"params": [
-				{ "type":"select", "id":"method", "title":"Method", "items":["GET", "HEAD", "POST"], "value":"GET" }, 
-				{ "type":"textarea", "id":"url", "title":"URL", "rows":3, "value":"http://" }, 
-				{ "type":"textarea", "id":"headers", "title":"Request Headers", "rows":4, "value":"User-Agent: Cronicle/1.0" }, 
-				{ "type":"textarea", "id":"data", "title":"POST Data", "rows":4, "value":"" }, 
-				{ "type":"text", "id":"timeout", "title":"Timeout (Seconds)", "size":5, "value":"30" }, 
-				{ "type":"checkbox", "id":"follow", "title":"Follow Redirects", "value":0 }, 
-				{ "type":"checkbox", "id":"ssl_cert_bypass", "title":"SSL Cert Bypass", "value":0 }, 
-				{ "type":"checkbox", "id":"parse_auth", "title":"Parse AUTH variable/secret as header", "value":1 }, 
-				{ "type":"text", "id":"success_match", "title":"Success Match", "size":20, "value":"" }, 
-				{ "type":"text", "id":"error_match", "title":"Error Match", "size":20, "value":"" }
-			]
-		} ],
-		[ "listCreate", "global/categories", {} ],
-		[ "listPush", "global/categories", {
-			"id": "general",
-			"title": "General",
-			"enabled": 1,
-			"username": "admin",
-			"modified": 1434125333,
-			"created": 1434125333,
-			"description": "For events that don't fit anywhere else.",
-			"gcolor": "#3498DB",
-			"max_children": 0
-		} ],
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hook_text_templates_job_failure",
+        "title": "web_hook_text_templates.job_failure",
+        "key": "❌ *[event_title]* failed on [hostname]: Error: _*[description]*_ <[job_details_url] | More details>",
+        "description": "Error notification (slack markdown by default)"
+      }
+    ],
 
-		[ "listCreate", "global/secrets", {} ],
-		[ "listPush", "global/secrets", {
-			"id": "globalenv",
-			"encrypted": true,
-			"target": null,
-			"modified": 1434125333,
-			"created": 1434125333,
-			"form": "props"
-		} ],
-		
-		[ "listCreate", "global/server_groups", {} ],
-		[ "listPush", "global/server_groups", {
-			"id": "maingrp",
-			"title": "Manager Group",
-			"regexp": "_HOSTNAME_",
-			"manager": 1
-		} ],
-		[ "listPush", "global/server_groups", {
-			"id": "workergrp",
-			"title": "Workers",
-			"regexp": "worker",
-			"manager": 0
-		} ],
-		[ "listPush", "global/server_groups", {
-			"id": "managergrp",
-			"title": "Managers",
-			"regexp": "manager",
-			"manager": 1
-		} ],
-		[ "listPush", "global/server_groups", {
-			"id": "allgrp",
-			"title": "All Servers",
-			"regexp": ".+",
-			"manager": 0
-		} ],
-		[ "listCreate", "global/servers", {} ],
-		[ "listPush", "global/servers", {
-			"hostname": "_HOSTNAME_",
-			"ip": "_IP_"
-		} ],
-		[ "listCreate", "global/schedule", {} ],
-		[ "listCreate", "global/api_keys", {} ],
-		[ "listCreate", "global/conf_keys", {} ],
-		[ "listPush", "global/conf_keys", {
-			"id": "base_app_url", 
-			"title": "base_app_url",
-			"key": "http://localhost:3012",
-			"description": "overrides app url displayed in notifications",
-			"optional": true
-		}],
-		[ "listPush", "global/conf_keys", {
-			"id": "ad_domain", 
-			"title": "ad_domain",
-			"key": "corp.cronicle.com",
-			"description": "default AD domain for external auth. You can also prepend domain to the username (e.g. user@domain.com)",
-			"optional": true
-		}],
-		[ "listPush", "global/conf_keys", {
-			"id": "smtp_hostname", 
-			"title": "smtp_hostname",
-			"key": "mailrelay.cronicle.com",
-			"description": "SMTP server (port 25 is used default)",
-			"optional": true
-		}],
-		[ "listPush", "global/conf_keys", {
-			"id": "email_from", 
-			"title": "email_from",
-			"key": "admin@cronicle.com",
-			"description": "Notification sender",
-			"optional": true
-		}],
-		[ "listPush", "global/conf_keys", {
-			"id": "admin_web_hook", 
-			"title": "admin_web_hook",
-			"key": "",
-			"description": "Webhook for activity log notifications. Uses slack markdown.\nTip: use cronicle run api to handle notification with custom event",
-			"optional": true
-		}],
-		[ "listPush", "global/conf_keys", {
-			"id": "custom_live_log_socket_url", 
-			"title": "custom_live_log_socket_url",
-			"key": "http://localhost:3012",
-			"description": "!this requires browser page refresh\noverrides the host for live log connection. On multinode cluster this can be assigned to each node, e.g. \ncustom_live_log_socket_url.manager\ncustom_live_log_socket_url.worker1\nCan specify custom port too. This is useful if using reverse proxy or docker/swarm",
-			"optional": true
-		}]
-		
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hook_text_templates_job_complete", 
-			"title": "web_hook_text_templates.job_complete",
-			"key": "✔️ *[event_title]* completed successfully on [hostname] <[job_details_url] | More details>",
-			"description": "Success notification (slack markdown by default)"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hook_text_templates_job_start",
+        "title": "web_hook_text_templates.job_start",
+        "key": "🚀 *[event_title]* started on [hostname] <[job_details_url] | More details>",
+        "description": "Start notification (slack markdown by default)"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hook_text_templates_job_failure", 
-			"title": "web_hook_text_templates.job_failure",
-			"key": "❌ *[event_title]* failed on [hostname]: Error: _*[description]*_ <[job_details_url] | More details>",
-			"description": "Error notification (slack markdown by default)"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hook_text_templates_job_warning",
+        "title": "web_hook_text_templates.job_warning",
+        "key": "⚠️ *[event_title]* completed with warning on [hostname]: Warning: _*[description]*_ <[job_details_url] | More details>",
+        "description": "Warning notification. Warning is exit code 255 (-1) and it's treaded as success"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hook_text_templates_job_start", 
-			"title": "web_hook_text_templates.job_start",
-			"key": "🚀 *[event_title]* started on [hostname] <[job_details_url] | More details>",
-			"description": "Start notification (slack markdown by default)"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hooks_slack_general",
+        "title": "web_hooks.slack_general",
+        "key": "https://hooks.slack.com/services/yourIncomingWebHook",
+        "description": "You can add webhook info under web_hooks object and then use property name (e.g. slack_general) to specify that webhook in notification options, instead of using full url. Use either url string (like this example) or object to specify custom data/options/headers and some other items (see example below)"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hook_text_templates_job_warning", 
-			"title": "web_hook_text_templates.job_warning",
-			"key": "⚠️ *[event_title]* completed with warning on [hostname]: Warning: _*[description]*_ <[job_details_url] | More details>",
-			"description": "Warning notification. Warning is exit code 255 (-1) and it's treaded as success"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hooks_slack_info_data_channel",
+        "title": "web_hooks.slack_info.data.channel",
+        "key": "cronicle",
+        "description": "Add custom key to request body (e.g. to specify channel)"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hooks_slack_general", 
-			"title": "web_hooks.slack_general",
-			"key": "https://hooks.slack.com/services/yourIncomingWebHook",
-			"description": "You can add webhook info under web_hooks object and then use property name (e.g. slack_general) to specify that webhook in notification options, instead of using full url. Use either url string (like this example) or object to specify custom data/options/headers and some other items (see example below)"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hooks_slack_info_textkey",
+        "title": "web_hooks.slack_info.textkey",
+        "key": "markdown",
+        "description": "By default cronicle message is added as <b>text</b> key on webhook request body. Use this config if you need to use something else (e.g. markdown, html, etc). You can specify nested key too using dot notation e.g. 'data.mytextkey'"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hooks_slack_info_data_channel", 
-			"title": "web_hooks.slack_info.data.channel",
-			"key": "cronicle",
-			"description": "Add custom key to request body (e.g. to specify channel)"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hooks_slack_info_compact",
+        "title": "web_hooks.slack_info.compact",
+        "type": "bool",
+        "key": false,
+        "description": "(Notification webhooks only) Include only basic info in payload (id, title, action) and your custom data. Useful in case of key conflicts"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hooks_slack_info_textkey", 
-			"title": "web_hooks.slack_info.textkey",
-			"key": "markdown",
-			"description": "By default cronicle message is added as <b>text</b> key on webhook request body. Use this config if you need to use something else (e.g. markdown, html, etc). You can specify nested key too using dot notation e.g. 'data.mytextkey'"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hooks_slack_info_token",
+        "title": "web_hooks.slack_info.token",
+        "key": "xoxp-xxxxxxxxx-xxxx",
+        "description": "This is a shortcut for web_hooks.slack_info.headers.Authorization = Bearer xoxp-xxxxxxxxx-xxxx"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hooks_slack_info_compact", 
-			"title": "web_hooks.slack_info.compact",
-			"type": "bool",
-			"key": false,
-			"description": "(Notification webhooks only) Include only basic info in payload (id, title, action) and your custom data. Useful in case of key conflicts"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "web_hooks_slack_info_url",
+        "title": "web_hooks.slack_info.url",
+        "key": "https://slack.com/api/chat.postMessage",
+        "description": "Specify webhook url (for object). If using incoming webhooks then just specify it as string (see slack_general example above)"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hooks_slack_info_token", 
-			"title": "web_hooks.slack_info.token",
-			"key": "xoxp-xxxxxxxxx-xxxx",
-			"description": "This is a shortcut for web_hooks.slack_info.headers.Authorization = Bearer xoxp-xxxxxxxxx-xxxx"
-		}]
-		
-		,[ "listPush", "global/conf_keys", {
-			"id": "web_hooks_slack_info_url", 
-			"title": "web_hooks.slack_info.url",
-			"key": "https://slack.com/api/chat.postMessage",
-			"description": "Specify webhook url (for object). If using incoming webhooks then just specify it as string (see slack_general example above)"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "oninfo_web_hook",
+        "title": "oninfo_web_hook",
+        "key": "",
+        "description": "Special webhook - will fire on info message, e.g. server startup/restart/error. Those messages appear on activity log",
+        "optional": true
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "oninfo_web_hook", 
-			"title": "oninfo_web_hook",
-			"key": "",
-			"description": "Special webhook - will fire on info message, e.g. server startup/restart/error. Those messages appear on activity log",
-			"optional": true
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "universal_web_hook",
+        "title": "universal_web_hook",
+        "key": "",
+        "description": "Special webhook - will fire on each job start/completion",
+        "optional": true
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "universal_web_hook", 
-			"title": "universal_web_hook",
-			"key": "",
-			"description": "Special webhook - will fire on each job start/completion",
-			"optional": true
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "onupdate_web_hook",
+        "title": "onupdate_web_hook",
+        "key": "",
+        "description": "Special webhook - will fire on metadata update (e.g. on event update)",
+        "optional": true
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "onupdate_web_hook", 
-			"title": "onupdate_web_hook",
-			"key": "",
-			"description": "Special webhook - will fire on metadata update (e.g. on event update)",
-			"optional": true
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "ui_live_log_ws",
+        "title": "ui.live_log_ws",
+        "type": "bool",
+        "key": false,
+        "description": "Turns on classic websocket api for live log",
+        "optional": true
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "ui_live_log_ws", 
-			"title": "ui.live_log_ws",
-			"type": "bool",
-			"key": false,
-			"description": "Turns on classic websocket api for live log",
-			"optional": true
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "params_demo",
+        "title": "params.sql.demo",
+        "key": "SELECT * FROM\nSOMETABLE s \nWHERE s.col = 30",
+        "type": "text/x-sql",
+        "description": " params config (object) can be used to set placeholders in shell scripts. You need to check 'resolve parameters' box in event parameters. To set placeholder use square braket syntax, e.g. for this parameter you should use [/sql/demo]"
+      }
+    ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "params_demo", 
-			"title": "params.sql.demo",
-			"key": "SELECT * FROM\nSOMETABLE s \nWHERE s.col = 30",
-			"type": "text/x-sql",
-			"description": " params config (object) can be used to set placeholders in shell scripts. You need to check 'resolve parameters' box in event parameters. To set placeholder use square braket syntax, e.g. for this parameter you should use [/sql/demo]"
-		}]
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "_read_me_",
+        "title": "_read_me_",
+        "key": "please read",
+        "description": "Those keys are applied right after storage and webserver init, and then can be updated at runtime (no need to restart cronicle). Please note that you cannot override storage/webserver parameters.\nTo add nested config (object) use dot syntax, e.g. servers.host1. If you convert some nested key into string it would erase related subkeys from config object. In this case just remove that string key and click reload button . To check actual config state use <b>Config Viewer</b> link"
+      }
+    ]
+  ],
 
-		,[ "listPush", "global/conf_keys", {
-			"id": "_read_me_", 
-			"title": "_read_me_",
-			"key": "please read",
-			"description": "Those keys are applied right after storage and webserver init, and then can be updated at runtime (no need to restart cronicle). Please note that you cannot override storage/webserver parameters.\nTo add nested config (object) use dot syntax, e.g. servers.host1. If you convert some nested key into string it would erase related subkeys from config object. In this case just remove that string key and click reload button . To check actual config state use <b>Config Viewer</b> link"
-		}]
+  "build": {
+    "common": [
+      [
+        "symlinkCompress",
+        "node_modules/jquery/dist/jquery.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/jquery-ui-dist/jquery-ui.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/jquery-ui-dist/jquery-ui.min.css",
+        "htdocs/css/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.min.css",
+        "htdocs/css/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/zxcvbn/dist/zxcvbn.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/chart.js/dist/Chart.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/xss/dist/xss.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/socket.io/client-dist/socket.io.min.js",
+        "htdocs/js/external/"
+      ],
 
+      [
+        "copyFiles",
+        "node_modules/vis-network/dist/vis-network.min.js",
+        "htdocs/js/external/"
+      ],
+      ["copyFiles", "node_modules/ansi_up/ansi_up.js", "htdocs/js/external/"],
+      [
+        "copyFiles",
+        "node_modules/graphlib/dist/graphlib.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "copyFiles",
+        "node_modules/jsonlint-mod/lib/jsonlint.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "copyFiles",
+        "node_modules/js-yaml/dist/js-yaml.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "copyFiles",
+        "node_modules/diff/dist/diff.min.js",
+        "htdocs/js/external/"
+      ],
 
+      ["symlinkFile", "node_modules/codemirror", "htdocs/codemirror"],
 
-	],
-	
-	"build": {
-		"common": [
-			[ "symlinkCompress", "node_modules/jquery/dist/jquery.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/jquery-ui-dist/jquery-ui.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/jquery-ui-dist/jquery-ui.min.css", "htdocs/css/" ],
-			[ "symlinkCompress", "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.full.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/jquery-datetimepicker/build/jquery.datetimepicker.min.css", "htdocs/css/" ],
-			[ "symlinkCompress", "node_modules/zxcvbn/dist/zxcvbn.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/chart.js/dist/Chart.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/xss/dist/xss.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/socket.io/client-dist/socket.io.min.js", "htdocs/js/external/" ],
-			
-			[ "copyFiles", "node_modules/vis-network/dist/vis-network.min.js", "htdocs/js/external/" ],
-			[ "copyFiles", "node_modules/ansi_up/ansi_up.js", "htdocs/js/external/" ],
-			[ "copyFiles", "node_modules/graphlib/dist/graphlib.min.js", "htdocs/js/external/" ],
-			[ "copyFiles", "node_modules/jsonlint-mod/lib/jsonlint.js", "htdocs/js/external/" ],
-			[ "copyFiles", "node_modules/js-yaml/dist/js-yaml.min.js", "htdocs/js/external/" ],
-			[ "copyFiles", "node_modules/diff/dist/diff.min.js", "htdocs/js/external/" ],
+      [
+        "symlinkCompress",
+        "node_modules/font-awesome/css/font-awesome.min.css",
+        "htdocs/css/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/font-awesome/css/font-awesome.css.map",
+        "htdocs/css/"
+      ],
+      ["copyFiles", "node_modules/font-awesome/fonts/*", "htdocs/fonts/"],
 
-			[ "symlinkFile", "node_modules/codemirror", "htdocs/codemirror" ],		
-			
-			[ "symlinkCompress", "node_modules/font-awesome/css/font-awesome.min.css", "htdocs/css/" ],
-			[ "symlinkCompress", "node_modules/font-awesome/css/font-awesome.css.map", "htdocs/css/" ],
-			[ "copyFiles", "node_modules/font-awesome/fonts/*", "htdocs/fonts/" ],
-			
-			[ "copyFiles", "node_modules/@mdi/font/css/materialdesignicons.min.css", "htdocs/css/" ],
-			[ "copyFiles", "node_modules/@mdi/font/fonts/*", "htdocs/fonts/" ],
-			
-			[ "symlinkCompress", "node_modules/moment/min/moment.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/moment-timezone/builds/moment-timezone-with-data.min.js", "htdocs/js/external/" ],
-			[ "symlinkCompress", "node_modules/jstimezonedetect/dist/jstz.min.js", "htdocs/js/external/" ],
-			
-			[ "symlinkFile", "node_modules/pixl-webapp/js", "htdocs/js/common" ],
-			[ "symlinkFile", "node_modules/pixl-webapp/css/base.css", "htdocs/css/" ],
-			[ "copyFiles", "node_modules/pixl-webapp/fonts/*", "htdocs/fonts/" ],
-			
-			[ "chmodFiles", "755", "bin/*" ]
-		],
-		"dev": [
-			[ "deleteFiles", "htdocs/css/_combo*" ],
-			[ "deleteFiles", "htdocs/js/_combo*" ],
-			[ "deleteFile", "htdocs/index.html" ],
-			[ "deleteFile", "htdocs/index.html.gz" ],
-			[ "symlinkFile", "htdocs/index-dev.html", "htdocs/index.html" ],
-			[ "symlinkFile", "sample_conf", "conf" ]
-		],
-		"dist": [
-			{
-				"action": "generateSecretKey",
-				"file": "sample_conf/config.json",
-				"key": "secret_key"
-			},
-			[ "copyDir", "sample_conf", "conf", true ],
-			[ "copyFile", "htdocs/index-dev.html", "htdocs/index.html" ],
-			
-			{
-				"action": "bundleCompress",
-				"uglify": false,
-				"header": "/* Copyright (c) PixlCore.com, MIT License. https://github.com/jhuckaby/Cronicle */",
-				"dest_bundle": "htdocs/js/_combo.js",
-				"html_file": "htdocs/index.html",
-				"match_key": "COMBINE_SCRIPT",
-				"dest_bundle_tag": "<script src=\"js/_combo.js\"></script>"
-			},
-			{
-				"action": "bundleCompress",
-				"strip_source_maps": true,
-				"dest_bundle": "htdocs/css/_combo.css",
-				"html_file": "htdocs/index.html",
-				"match_key": "COMBINE_STYLE",
-				"dest_bundle_tag": "<link rel=\"stylesheet\" href=\"css/_combo.css\">"
-			},
-			{
-				"action": "printMessage",
-				"lines": [
-					"Welcome to Cronicle!",
-					"First time installing?  You should configure your settings in '/opt/cronicle/conf/config.json'.",
-					"Next, if this is a manager server, type: '/opt/cronicle/bin/control.sh setup' to init storage.",
-					"Then, to start the service, type: '/opt/cronicle/bin/control.sh start'.",
-					"For full docs, please visit: http://github.com/jhuckaby/Cronicle",
-					"Enjoy!"
-				]
-			}
-		]
-	}
+      [
+        "copyFiles",
+        "node_modules/@mdi/font/css/materialdesignicons.min.css",
+        "htdocs/css/"
+      ],
+      ["copyFiles", "node_modules/@mdi/font/fonts/*", "htdocs/fonts/"],
+
+      [
+        "symlinkCompress",
+        "node_modules/moment/min/moment.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/moment-timezone/builds/moment-timezone-with-data.min.js",
+        "htdocs/js/external/"
+      ],
+      [
+        "symlinkCompress",
+        "node_modules/jstimezonedetect/dist/jstz.min.js",
+        "htdocs/js/external/"
+      ],
+
+      ["symlinkFile", "node_modules/pixl-webapp/js", "htdocs/js/common"],
+      ["symlinkFile", "node_modules/pixl-webapp/css/base.css", "htdocs/css/"],
+      ["copyFiles", "node_modules/pixl-webapp/fonts/*", "htdocs/fonts/"],
+
+      ["chmodFiles", "755", "bin/*"]
+    ],
+    "dev": [
+      ["deleteFiles", "htdocs/css/_combo*"],
+      ["deleteFiles", "htdocs/js/_combo*"],
+      ["deleteFile", "htdocs/index.html"],
+      ["deleteFile", "htdocs/index.html.gz"],
+      ["symlinkFile", "htdocs/index-dev.html", "htdocs/index.html"],
+      ["symlinkFile", "sample_conf", "conf"]
+    ],
+    "dist": [
+      {
+        "action": "generateSecretKey",
+        "file": "sample_conf/config.json",
+        "key": "secret_key"
+      },
+      ["copyDir", "sample_conf", "conf", true],
+      ["copyFile", "htdocs/index-dev.html", "htdocs/index.html"],
+
+      {
+        "action": "bundleCompress",
+        "uglify": false,
+        "header": "/* Copyright (c) PixlCore.com, MIT License. https://github.com/jhuckaby/Cronicle */",
+        "dest_bundle": "htdocs/js/_combo.js",
+        "html_file": "htdocs/index.html",
+        "match_key": "COMBINE_SCRIPT",
+        "dest_bundle_tag": "<script src=\"js/_combo.js\"></script>"
+      },
+      {
+        "action": "bundleCompress",
+        "strip_source_maps": true,
+        "dest_bundle": "htdocs/css/_combo.css",
+        "html_file": "htdocs/index.html",
+        "match_key": "COMBINE_STYLE",
+        "dest_bundle_tag": "<link rel=\"stylesheet\" href=\"css/_combo.css\">"
+      },
+      {
+        "action": "printMessage",
+        "lines": [
+          "Welcome to Cronicle!",
+          "First time installing?  You should configure your settings in '/opt/cronicle/conf/config.json'.",
+          "Next, if this is a manager server, type: '/opt/cronicle/bin/control.sh setup' to init storage.",
+          "Then, to start the service, type: '/opt/cronicle/bin/control.sh start'.",
+          "For full docs, please visit: http://github.com/jhuckaby/Cronicle",
+          "Enjoy!"
+        ]
+      }
+    ]
+  }
 }

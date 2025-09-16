@@ -1,0 +1,40 @@
+############################################################
+###  Build Template
+##
+##   - The name of the workflow will be used to produce the
+##     name of the project. It must be unique.
+## 
+############################################################
+
+############### Change this ################################
+name: Cronicle
+############################################################
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      ############### then HERE (1) ########################
+      - "cronicle/**"
+      ######################################################
+
+############################################################
+###  The project-dir values below must be updated
+############################################################
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+
+  build:
+    if: ${{ github.event_name == 'push' ||  github.event_name == 'workflow_dispatch' }}
+    uses: ./.github/workflows/reusable-build-workflow.yml
+    secrets:
+      NPM_TOKEN: ${{ secrets.DEPLOY_AGENT_GH_TOKEN }}
+    with:
+      ############### HERE (4) #############################
+      project-dir: "cronicle"
+      ######################################################
+      job-name: ${{ github.workflow }}

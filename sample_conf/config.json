@@ -113,7 +113,7 @@
 	
 	"WebServer": {
     "http_port": 3012,
-    "http_htdocs_dir": "htdocs",
+	"http_htdocs_dir": "htdocs",
     "http_max_upload_size": 104857600,
     "http_static_ttl": 3600,
     "http_static_index": "index.html",

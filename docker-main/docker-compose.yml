@@ -1,0 +1,33 @@
+services:
+  cronicle:
+    # vimage: cronicle/cronicle:latest
+    image: 173305588364.dkr.ecr.us-east-2.amazonaws.com/cronicle:$TAG
+    # hostname: cronicle-master
+    restart: always
+    network_mode: host
+    # ports:
+    #  - '80:3012'
+    environment:
+      - AWS_REGION=us-east-2
+      - EFS_ID=${EFS_ID}
+      - TZ=America/Chicago
+      - CRONICLE_base_app_url=https://batch.paops.xyz
+      - CRONICLE_WebServer__http_port=80
+    # command: "/opt/cronicle/bin/manager"
+    # command: "tail -f /dev/null"    
+
+#    volumes:
+#      - efs-data:/opt/cronicle/data
+
+#    healthcheck:
+#      test: ["CMD", "sh", "-c", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1"]
+#      interval: 30s
+#      timeout: 5s
+#      retries: 5
+
+#volumes:
+#  efs-data:
+#    driver_opts:
+#      type: nfs
+#      o: addr=${EFS_ID}.efs.us-east-2.amazonaws.com,rw,nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+#      device: :/

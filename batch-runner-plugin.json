@@ -1,0 +1,35 @@
+{
+  "id": "batch-runner",
+  "title": "Batch Runner",
+  "command": "node bin/batch-runner-plugin.js",
+  "enabled": 1,
+  "params": [
+    {
+      "id": "name",
+      "title": "Job Name",
+      "type": "text",
+      "required": 1
+    },
+    {
+      "id": "version",
+      "title": "Version",
+      "type": "text",
+      "required": 1
+    },
+    {
+      "id": "environment",
+      "title": "Environment",
+      "type": "select",
+      "items": ["padev", "privateauto"],
+      "default": "padev",
+      "required": 1
+    },
+    {
+      "id": "command",
+      "title": "Command",
+      "type": "text",
+      "multi": 1,
+      "required": 1
+    }
+  ]
+}

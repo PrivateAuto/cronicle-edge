@@ -11,7 +11,8 @@ FROM cronicle/base-alpine as build
 RUN apk add --no-cache npm python3 alpine-sdk
 COPY . /build
 WORKDIR /build
-RUN ./bundle /dist --mysql --pgsql --s3 --sqlite --tools
+# RUN ./bundle /dist --mysql --pgsql --s3 --sqlite --tools
+RUN ./bundle /dist --s3 --tools
 
 FROM cronicle/base-alpine 
 
@@ -25,7 +26,7 @@ COPY --from=build /dist /opt/cronicle
 ENV PATH "/opt/cronicle/bin:${PATH}"
 ENV CRONICLE_foreground=1
 ENV CRONICLE_echo=1
-ENV TZ=America/New_York 
+ENV TZ=America/Chicago 
 
 WORKDIR /opt/cronicle 
 
