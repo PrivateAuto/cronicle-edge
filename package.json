@@ -12,7 +12,7 @@
 		 "docker-main/.platform"
     ],
 	"scripts": {
-		"build": ";",
+		"build": "echo",
 		"test": "pixl-unit lib/test.js",
 		"boot": "pixl-boot install",
 		"unboot": "pixl-boot uninstall"
