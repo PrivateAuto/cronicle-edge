@@ -1,0 +1,15 @@
+name: 'Google Chat'
+description: 'Send a Google CHat message via a webhook'
+inputs:
+   notify-url:
+      description: 'Google Chat webhook URL'
+      required: true
+      default: 'https://chat.googleapis.com/v1/spaces/AAAALd1rTEQ/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=Pai1PS9iumv4MhY6ICrDp4Xnw3FoSKcCW6pFRSHLfek%3D'
+   message:
+      description: 'Google Chat webhook URL'
+      required: true
+      default: 'You are being notified of something.....'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+

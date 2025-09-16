@@ -1,0 +1,13 @@
+{
+  "name": "GoogleChat",
+  "version": "1.0.0",
+  "description": "Send a Google Chat message via a webhook",
+  "main": "google-chat.js",
+  "scripts": {
+    "build": "ncc build google-chat.js --source-map --license license.txt"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0"
+  }
+}

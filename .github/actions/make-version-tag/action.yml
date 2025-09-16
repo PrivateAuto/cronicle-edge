@@ -1,0 +1,26 @@
+name: "Make Version Tag"
+id: make-version-tag
+description: "Make Version Tag"
+inputs:
+  projectName:
+    description: "Project Name"
+    required: false
+    default: "${{ github.workflow }}"
+  hash:
+    description: "Hash"
+    required: false
+    default: "${{ github.sha }}"
+  extraName:
+    description: "Extra Name"
+    required: false
+    default: ""
+outputs:
+  version:
+    description: "Version"
+    value: ${{ steps.run.outputs.version }}
+  safeName:
+    description: "Safe Name"
+    value: ${{ steps.run.outputs.safeName }}
+runs:
+  using: "node20"
+  main: "dist/index.js"
