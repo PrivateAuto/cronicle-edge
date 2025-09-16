@@ -31,8 +31,6 @@ jobs:
   build:
     if: ${{ github.event_name == 'push' ||  github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/reusable-build-workflow.yml
-    secrets:
-      NPM_TOKEN: ${{ secrets.DEPLOY_AGENT_GH_TOKEN }}
     with:
       ############### HERE (4) #############################
       project-dir: "."

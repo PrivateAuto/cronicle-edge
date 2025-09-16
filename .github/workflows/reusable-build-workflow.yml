@@ -2,9 +2,6 @@ name: Build an SST/CDK/Docker project
 
 on:
   workflow_call:
-    secrets:
-      NPM_TOKEN:
-        required: true
     inputs:
       job-name:
         description: "Job Name"
@@ -34,7 +31,6 @@ env:
   AWS_REGION: ${{ inputs.region }}
   DOCKER_IMAGE: ${{ inputs.job-name }}
   REGISTRY_ID: ${{ inputs.registry-id }}
-  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   REGION: ${{ inputs.region }}
   PADEV_ROLE_ARN: "arn:aws:iam::337636387741:role/GitHubActions"
   ECR_REPO: "${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
