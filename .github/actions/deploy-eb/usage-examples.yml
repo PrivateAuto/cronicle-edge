@@ -1,0 +1,144 @@
+# Example workflow using the composite action
+name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Elastic Beanstalk (using OIDC)
+        uses: ./path-to-your-action  # or your-org/your-action-repo@v1
+        with:
+          aws-region: us-east-1
+          aws-role-arn: arn:aws:iam::123456789012:role/GitHubActionsRole
+          app-name: my-eb-app
+          version-label: ${{ github.sha }}
+          s3-bucket: my-deployment-bucket
+          package-name: my-package
+          deploy-stage: production
+          timeout-minutes: 15
+
+      - name: Deploy to Elastic Beanstalk (using access keys)
+        uses: ./path-to-your-action
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          app-name: my-eb-app
+          version-label: v${{ github.run_number }}
+          s3-bucket: my-deployment-bucket
+          package-name: my-package
+          deploy-stage: staging
+
+---
+
+# Example with multiple environments
+name: Multi-Environment Deploy
+
+on:
+  push:
+    branches: [main, develop]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Staging
+        uses: ./
+        with:
+          aws-region: us-west-2
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN_STAGING }}
+          app-name: my-app-staging
+          version-label: staging-${{ github.sha }}
+          s3-bucket: staging-deployment-bucket
+          package-name: my-app
+          deploy-stage: staging
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production  # Requires manual approval
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Production
+        uses: ./
+        with:
+          aws-region: us-east-1
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          app-name: my-app-production
+          version-label: prod-${{ github.sha }}
+          s3-bucket: production-deployment-bucket
+          package-name: my-app
+          deploy-stage: production
+          timeout-minutes: 20
+
+---
+
+# AWS IAM Role Setup for OIDC (recommended approach)
+# Create this role in your AWS account and use the ARN in aws-role-arn input
+
+# Trust policy for the role:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::ACCOUNT-ID:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:YOUR-ORG/YOUR-REPO:*"
+        }
+      }
+    }
+  ]
+}
+
+# Required permissions policy:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticbeanstalk:DescribeApplications",
+        "elasticbeanstalk:DescribeApplicationVersions",
+        "elasticbeanstalk:CreateApplicationVersion",
+        "elasticbeanstalk:DescribeEnvironments",
+        "elasticbeanstalk:UpdateEnvironment",
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::your-deployment-bucket/*"
+    }
+  ]
+}

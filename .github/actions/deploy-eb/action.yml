@@ -1,0 +1,161 @@
+name: 'Deploy to AWS Elastic Beanstalk'
+description: 'Deploy application to AWS Elastic Beanstalk with version management'
+
+inputs:
+  app-name:
+    description: 'Elastic Beanstalk application name'
+    required: true
+  version-label:
+    description: 'Version label for the deployment'
+    required: true
+  s3-bucket:
+    description: 'S3 bucket containing the application bundle'
+    required: true
+  package-name:
+    description: 'Package name for naming the S3 key'
+    required: true
+  deploy-stage:
+    description: 'Deployment stage'
+    required: false
+    default: 'no-stage'
+  timeout-minutes:
+    description: 'Timeout in minutes for waiting operations'
+    required: false
+    default: '10'
+  aws-region:
+    description: 'AWS region for Elastic Beanstalk'
+    required: false
+    default: "us-east-2"
+    type: string
+
+outputs:
+  environment-name:
+    description: 'Name of the environment that was deployed to'
+    value: ${{ steps.deploy.outputs.environment-name }}
+  deployment-status:
+    description: 'Status of the deployment'
+    value: ${{ steps.deploy.outputs.deployment-status }}
+
+runs:
+  using: composite
+  steps:
+    - name: Verify AWS identity
+      shell: bash
+      run: |
+        echo "Current AWS identity:"
+        aws sts get-caller-identity
+
+    - name: Deploy to Elastic Beanstalk
+      id: deploy
+      shell: bash
+      env:
+        APP_NAME: ${{ inputs.app-name }}
+        VERSION_LABEL: ${{ inputs.version-label }}
+        S3_BUCKET: ${{ inputs.s3-bucket }}
+        PACKAGE_NAME: ${{ inputs.package-name }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        TIMEOUT_MINUTES: ${{ inputs.timeout-minutes }}
+      run: |
+        set -e
+        
+        S3_KEY="${PACKAGE_NAME}-${VERSION_LABEL}.zip"
+        
+        # Check if application exists
+        echo "Checking for application [$APP_NAME]..."
+        if ! aws elasticbeanstalk describe-applications --application-names "$APP_NAME" --region "$AWS_REGION" --output json | jq -e '.Applications | length > 0' > /dev/null; then
+          echo "Error: Application $APP_NAME does not exist."
+          exit 1
+        fi
+        
+        # Check if version exists
+        echo "Checking for version $VERSION_LABEL in application $APP_NAME..."
+        VERSION_EXISTS=$(aws elasticbeanstalk describe-application-versions \
+          --application-name "$APP_NAME" \
+          --version-labels "$VERSION_LABEL" \
+          --region "$AWS_REGION" \
+          --output json | jq '.ApplicationVersions | length')
+        
+        if [ "$VERSION_EXISTS" -gt 0 ]; then
+          echo "Version $VERSION_LABEL already exists for application $APP_NAME. Skipping create..."
+        else
+          echo "Version $VERSION_LABEL not found for application $APP_NAME. Creating..."
+          aws elasticbeanstalk create-application-version \
+            --application-name "$APP_NAME" \
+            --version-label "$VERSION_LABEL" \
+            --description "$S3_KEY" \
+            --source-bundle S3Bucket="$S3_BUCKET",S3Key="$S3_KEY" \
+            --region "$AWS_REGION"
+          echo "Created version $VERSION_LABEL for application $APP_NAME."
+        fi
+        
+        # Find ready environment
+        echo "Finding environment to use..."
+        ENV_NAME=""
+        COUNT=0
+        TIMEOUT_COUNT=$((TIMEOUT_MINUTES * 2))  # Check every 30 seconds
+        
+        while [ -z "$ENV_NAME" ] && [ $COUNT -lt $TIMEOUT_COUNT ]; do
+          echo "Checking environments (attempt $((COUNT + 1)))..."
+          
+          ENVIRONMENTS=$(aws elasticbeanstalk describe-environments \
+            --application-name "$APP_NAME" \
+            --region "$AWS_REGION" \
+            --output json)
+          
+          ENV_NAME=$(echo "$ENVIRONMENTS" | jq -r '.Environments[] | select(.Status == "Ready") | .EnvironmentName' | head -n1)
+          
+          if [ -n "$ENV_NAME" ]; then
+            echo "Environment $ENV_NAME is ready for deployment."
+            break
+          fi
+          
+          COUNT=$((COUNT + 1))
+          if [ $COUNT -lt $TIMEOUT_COUNT ]; then
+            echo "No ready environment found. Waiting 30 seconds..."
+            sleep 30
+          fi
+        done
+        
+        if [ -z "$ENV_NAME" ]; then
+          echo "Timeout waiting for an available environment"
+          exit 1
+        fi
+        
+        # Deploy to environment
+        echo "Deploying version $VERSION_LABEL to environment $ENV_NAME..."
+        aws elasticbeanstalk update-environment \
+          --application-name "$APP_NAME" \
+          --environment-name "$ENV_NAME" \
+          --version-label "$VERSION_LABEL" \
+          --region "$AWS_REGION"
+        
+        # Wait for deployment completion
+        echo "Waiting for deployment to complete..."
+        while true; do
+          ENV_INFO=$(aws elasticbeanstalk describe-environments \
+            --application-name "$APP_NAME" \
+            --environment-names "$ENV_NAME" \
+            --region "$AWS_REGION" \
+            --output json | jq '.Environments[0]')
+          
+          STATUS=$(echo "$ENV_INFO" | jq -r '.Status')
+          HEALTH=$(echo "$ENV_INFO" | jq -r '.Health')
+          CURRENT_VERSION=$(echo "$ENV_INFO" | jq -r '.VersionLabel')
+          
+          echo "Environment $ENV_NAME Status: $STATUS Health: $HEALTH Version: $CURRENT_VERSION"
+          
+          if [ "$STATUS" = "Ready" ]; then
+            if [ "$VERSION_LABEL" != "$CURRENT_VERSION" ]; then
+              echo "Error: Deployment failed. Expected version $VERSION_LABEL but got $CURRENT_VERSION"
+              exit 1
+            fi
+            echo "Deployment completed successfully!"
+            break
+          fi
+          
+          sleep 10
+        done
+        
+        # Set outputs
+        echo "environment-name=$ENV_NAME" >> $GITHUB_OUTPUT
+        echo "deployment-status=success" >> $GITHUB_OUTPUT
