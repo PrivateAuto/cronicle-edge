@@ -139,17 +139,18 @@ jobs:
         id: package-release
         run: |
           # like yarn pack
-          [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' docker-compose.yml
-          cat docker-compose.yml
+          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
+          [ -f ./docker-main/docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' ./docker-main/docker-compose.yml
+          cat ./docker-main/docker-compose.yml
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
-          tar czf ${{ env.ASSET }} $FILES
+          zip -r0v9 ${ASSET} $FILES
 
       - name: Publish Release files
         # if: github.ref_name == github.event.repository.default_branch
         working-directory: ${{ inputs.project-dir }}
         id: package-publish
         run: |
-          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.tgz" 
+          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
           HASH=$(sha256sum ${ASSET} | awk '{print $1;}')
           aws codeartifact publish-package-version --domain privateauto --repository privateauto --region us-east-2 --domain-owner 173305588364 \
                 --format generic --namespace api --package ${PROJECT_NAME} --package-version ${{ steps.make-version-tag.outputs.version }} \
@@ -161,8 +162,9 @@ jobs:
         working-directory: ${{ inputs.project-dir }}
         id: package-stage
         run: |
+          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
           echo "Staging ${{ env.ASSET }} to S3..."
-          aws s3 cp ${{ env.ASSET }} s3://pa-build-cache-dev2/${{ env.ASSET }}
+          aws s3 cp ${ASSET} s3://pa-build-cache-dev2/${ASSET}
         
       - name: Deploy padev (EB)
         # if: github.ref_name == github.event.repository.default_branch
