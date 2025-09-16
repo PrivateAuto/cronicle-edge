@@ -47,7 +47,8 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: ubuntu-latest      
+    # runs-on: warp-ubuntu-latest-x64-2x
     defaults:
       run:
         shell: sh
@@ -62,8 +63,8 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           role-session-name: pa_github_actions
-          role-to-assume: ${{ inputs.PADEV_ROLE_ARN }}
-          aws-region: ${{ inputs.AWS_REGION }}
+          role-to-assume: ${{ env.PADEV_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
         
       - name: STS GetCallerIdentity
         shell: bash
