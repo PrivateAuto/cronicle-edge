@@ -13,11 +13,6 @@ name: Cronicle
 on:
   workflow_dispatch:
   push:
-#    paths:
-  #
-      ############### then HERE (1) ########################
-#      - "**"
-      ######################################################
 
 ############################################################
 ###  The project-dir values below must be updated

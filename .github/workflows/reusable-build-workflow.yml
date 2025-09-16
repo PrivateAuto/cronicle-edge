@@ -153,7 +153,7 @@ jobs:
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
           HASH=$(sha256sum ${ASSET} | awk '{print $1;}')
           aws codeartifact publish-package-version --domain privateauto --repository privateauto --region us-east-2 --domain-owner 173305588364 \
-                --format generic --namespace api --package ${PROJECT_NAME} --package-version ${{ steps.make-version-tag.outputs.version }} \
+                --format generic --namespace api --package ${{ env.PROJECT_NAME }} --package-version ${{ env.VER }} \
                 --asset-content ${ASSET} --asset-name ${ASSET} \
                 --asset-sha256 $HASH
 
