@@ -90,7 +90,7 @@ jobs:
         working-directory: ${{ inputs.project-dir }}
         run: |
           PROJECT_TYPE=`dirname ${{ inputs.project-dir }}`
-          PROJECT_NAME=`basename ${{ inputs.project-dir }}`
+          PROJECT_NAME=`basename ${{ inputs.job-name }}`
           ASSET="${PROJECT_NAME}-${{ env.VER }}.tgz" 
 
           echo "PROJECT_TYPE=$PROJECT_TYPE" >> $GITHUB_ENV
