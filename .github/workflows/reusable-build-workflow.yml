@@ -29,7 +29,6 @@ permissions:
 
 env:
   AWS_REGION: ${{ inputs.region }}
-  DOCKER_IMAGE: ${{ inputs.job-name }}
   REGISTRY_ID: ${{ inputs.registry-id }}
   REGION: ${{ inputs.region }}
   PADEV_ROLE_ARN: "arn:aws:iam::337636387741:role/GitHubActions"
@@ -37,7 +36,7 @@ env:
 
 
   VER: ''
-  PROJECT_NAME: ''
+  PROJECT_NAME:  ${{ inputs.job-name }}
   has_build: 'false'
   has_docker: 'false'
 
@@ -121,7 +120,7 @@ jobs:
         working-directory: ${{ inputs.project-dir }}
         run: |
           REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
-          TAG="${{ env.PROJECT_NAME }}-${{ env.VER }}"
+          TAG="${{ env.VER }}"
           echo "${REG}:${TAG}"
           docker build . --platform=linux/amd64 --tag ${REG}:${TAG}
           docker image tag ${REG}:${TAG} ${REG}:latest
@@ -131,7 +130,7 @@ jobs:
         working-directory: ${{ inputs.project-dir }}
         run: |
           REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
-          TAG="${{ steps.make-version-tag.outputs.safeName }}-${{ steps.make-version-tag.outputs.version }}"
+          TAG="${{ steps.make-version-tag.outputs.version }}"
           docker push -a ${REG}
 
       - name: Package Release files                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
