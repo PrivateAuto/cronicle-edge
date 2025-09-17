@@ -139,7 +139,8 @@ jobs:
         id: package-release
         run: |
           # like yarn pack
-          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
+          ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip"
+          TAG="${{ env.PROJECT_NAME }}-${{ env.VER }}"
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
           cd docker-main
           [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' docker-compose.yml
