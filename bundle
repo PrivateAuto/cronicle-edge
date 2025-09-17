@@ -402,12 +402,12 @@ if [ ! -d $dist/conf ]; then
   writehead "Setting up initial configs"
   mkdir -p $dist/conf
   cp sample_conf/config.json sample_conf/setup.json $dist/conf/
-  cp  sample_conf/*.pem $dist/conf/
   cp -r sample_conf/emails $dist/conf/emails
   LC_CTYPE=C
   cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 > $dist/conf/secret_key
   chmod 400 $dist/conf/secret_key
 fi
+cp  sample_conf/*.pem sample_conf/*.crt $dist/conf/
 
 # -- override storage engine if specified
 if [ -f "sample_conf/examples/storage.$engine.json" ]; then
