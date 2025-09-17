@@ -180,16 +180,16 @@ jobs:
           package-name: ${{ env.PROJECT_NAME }}
           version-label: ${{ env.VER }}
 
-      - name: Send success message
-        id: send-success-message
-        if: success()
-        uses: ./.github/actions/google-chat
-        with:
-          message: "SUCCESS: padev : ${{ inputs.job-name }}  ${{ steps.make-version-tag.outputs.version }}"
+#      - name: Send success message
+#        id: send-success-message
+#        if: success()
+#        uses: ./.github/actions/google-chat
+#        with:
+#          message: "SUCCESS: padev : ${{ inputs.job-name }}  ${{ steps.make-version-tag.outputs.version }}"
 
-      - name: Send failure message
-        id: send-failure-message
-        if: failure()
-        uses: ./.github/actions/google-chat
-        with:
-          message: "FAILED: padev : ${{ inputs.job-name }}  ${{ steps.make-version-tag.outputs.version }}"
+#      - name: Send failure message
+#        id: send-failure-message
+#        if: failure()
+#        uses: ./.github/actions/google-chat
+#        with:
+#          message: "FAILED: padev : ${{ inputs.job-name }}  ${{ steps.make-version-tag.outputs.version }}"
