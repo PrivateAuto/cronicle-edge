@@ -144,7 +144,7 @@ jobs:
           cd docker-main
           [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' docker-compose.yml
           cat docker-compose.yml
-          zip -r0v9 ${ASSET} $FILES
+          zip -r0v9 ../${ASSET} $FILES
 
       - name: Publish Release files
         # if: github.ref_name == github.event.repository.default_branch
