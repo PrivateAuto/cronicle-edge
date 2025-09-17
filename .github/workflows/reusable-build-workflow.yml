@@ -33,10 +33,8 @@ env:
   REGION: ${{ inputs.region }}
   PADEV_ROLE_ARN: "arn:aws:iam::337636387741:role/GitHubActions"
   ECR_REPO: "${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
-
-
-  VER: ''
   PROJECT_NAME:  ${{ inputs.job-name }}
+  VER: ''
   has_build: 'false'
   has_docker: 'false'
 
@@ -89,12 +87,7 @@ jobs:
       - name: Detect Configuration
         working-directory: ${{ inputs.project-dir }}
         run: |
-          PROJECT_TYPE=`dirname ${{ inputs.project-dir }}`
-          PROJECT_NAME=`basename ${{ inputs.job-name }}`
           ASSET="${PROJECT_NAME}-${{ env.VER }}.tgz" 
-
-          echo "PROJECT_TYPE=$PROJECT_TYPE" >> $GITHUB_ENV
-          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
           echo "ASSET=$ASSET" >> $GITHUB_ENV
 
       - name: Getting fresh dependencies
@@ -119,7 +112,7 @@ jobs:
       - name: Make Docker
         working-directory: ${{ inputs.project-dir }}
         run: |
-          REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
+          REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ env.PROJECT_NAME }}"
           TAG="${{ env.VER }}"
           echo "${REG}:${TAG}"
           docker build . --platform=linux/amd64 --tag ${REG}:${TAG}
@@ -129,7 +122,7 @@ jobs:
         if: env.has_docker == 'true'
         working-directory: ${{ inputs.project-dir }}
         run: |
-          REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{ inputs.job-name }}"
+          REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{  env.PROJECT_NAME }}"
           TAG="${{ steps.make-version-tag.outputs.version }}"
           docker push -a ${REG}
 
@@ -166,7 +159,7 @@ jobs:
         id: package-stage
         run: |
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
-          echo "Staging ${{ env.ASSET }} to S3..."
+          echo "Staging ${ASSET} to S3..."
           aws s3 cp ${ASSET} s3://pa-build-cache-ops/${ASSET}
         
       - name: Deploy padev (EB)
