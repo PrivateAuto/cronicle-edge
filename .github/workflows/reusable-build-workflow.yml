@@ -172,7 +172,7 @@ jobs:
         uses: ./.github/actions/deploy-eb
         with:
           aws-region: ${{ inputs.region }}
-          app-name: ${{ env.PROJECT_NAME }}
+          app-name: cronicle-master-app
           s3-bucket: 'pa-build-cache-ops'
           package-name: ${{ env.PROJECT_NAME }}
           version-label: ${{ env.VER }}
