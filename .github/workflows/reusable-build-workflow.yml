@@ -140,10 +140,11 @@ jobs:
         run: |
           # like yarn pack
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip"
-          TAG="${{ env.PROJECT_NAME }}-${{ env.VER }}"
+          export TAG="${{ env.PROJECT_NAME }}-${{ env.VER }}"
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
           cd docker-main
-          [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' docker-compose.yml
+          echo "TAG: $TAG"
+          [ -f docker-compose.yml ] && cp docker-compose.yml tmp && envsubst < tmp > docker-compose.yml
           cat docker-compose.yml
           zip -r0v9 ../${ASSET} $FILES
 
