@@ -140,7 +140,7 @@ jobs:
         run: |
           # like yarn pack
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip"
-          export TAG="${{ env.PROJECT_NAME }}-${{ env.VER }}"
+          export TAG="${{ env.VER }}"
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
           cd docker-main
           echo "TAG: $TAG"
