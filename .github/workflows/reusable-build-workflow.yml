@@ -142,7 +142,7 @@ jobs:
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
           cd docker-main
-          [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' /docker-compose.yml
+          [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' docker-compose.yml
           cat docker-compose.yml
           zip -r0v9 ${ASSET} $FILES
 
