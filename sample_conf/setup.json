@@ -685,43 +685,43 @@
       }
     ],
 
-	[
-		"listPush",
-		"global/conf_keys",
-		{
-		  "id": "mongosh",
-		  "title": "MongoDB (mongosh)",
-		  "enabled": 1,
-		  "command": "node bin/mongosh-plugin.js",
-		  "username": "admin",
-		  "modified": 1434125333,
-		  "created": 1434125333,
-		  "params": {
-			"environment": {
-			  "title": "Environment",
-			  "type": "select",
-			  "items": ["padev", "privateauto"],
-			  "default": "padev",
-			  "required": 1
-			},
-			"inline_script": {
-			  "title": "Inline Script",
-			  "type": "textarea",
-			  "rows": 10
-			},
-			"extra_args": {
-			  "title": "Extra mongosh args",
-			  "type": "text"
-			},
-			"quiet": {
-			  "title": "Quiet output",
-			  "type": "checkbox",
-			  "default": 0
-			}
-		  }
-		}
-	  ],
-		  
+    [
+      "listPush",
+      "global/conf_keys",
+      {
+        "id": "mongosh",
+        "title": "MongoDB (mongosh)",
+        "enabled": 1,
+        "command": "node bin/mongosh-plugin.js",
+        "username": "admin",
+        "modified": 1434125333,
+        "created": 1434125333,
+        "params": {
+          "environment": {
+            "title": "Environment",
+            "type": "select",
+            "items": ["padev", "privateauto"],
+            "default": "padev",
+            "required": 1
+          },
+          "inline_script": {
+            "title": "Inline Script",
+            "type": "textarea",
+            "rows": 10
+          },
+          "extra_args": {
+            "title": "Extra mongosh args",
+            "type": "text"
+          },
+          "quiet": {
+            "title": "Quiet output",
+            "type": "checkbox",
+            "default": 0
+          }
+        }
+      }
+    ],
+
     [
       "listPush",
       "global/conf_keys",

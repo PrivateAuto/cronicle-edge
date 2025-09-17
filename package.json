@@ -7,10 +7,10 @@
 	"license": "MIT",
 	"main": "lib/main.js",
 	"files": [
-		 "docker-compose.yml",
-		 ".ebextensions",
-		 ".platform"
-    ],
+		"docker-compose.yml",
+		".ebextensions",
+		".platform"
+	],
 	"scripts": {
 		"build": "echo",
 		"test": "pixl-unit lib/test.js",
@@ -38,6 +38,7 @@
 		"@xterm/xterm": "^5.5.0",
 		"ansi_up": "^5.1.0",
 		"async": "2.6.4",
+		"aws-iot-device-sdk": "^2.2.15",
 		"bcrypt-node": "0.1.0",
 		"chart.js": "^2.9.4",
 		"codemirror": "^5.65.16",
