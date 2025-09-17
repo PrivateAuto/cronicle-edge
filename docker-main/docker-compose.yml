@@ -1,6 +1,5 @@
 services:
   cronicle:
-    # vimage: cronicle/cronicle:latest
     image: 173305588364.dkr.ecr.us-east-2.amazonaws.com/cronicle:$TAG
     # hostname: cronicle-master
     restart: always
@@ -13,7 +12,7 @@ services:
       - TZ=America/Chicago
       - CRONICLE_base_app_url=https://batch.paops.xyz
       - CRONICLE_WebServer__http_port=80
-    # command: "/opt/cronicle/bin/manager"
+    command: "/opt/cronicle/bin/manager"
     # command: "tail -f /dev/null"    
 
 #    volumes:
