@@ -140,9 +140,10 @@ jobs:
         run: |
           # like yarn pack
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip" 
-          [ -f ./docker-main/docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' ./docker-main/docker-compose.yml
-          cat ./docker-main/docker-compose.yml
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
+          cd docker-main
+          [ -f docker-compose.yml ] && sed -i 's/\$TAG/${TAG}/g' /docker-compose.yml
+          cat docker-compose.yml
           zip -r0v9 ${ASSET} $FILES
 
       - name: Publish Release files

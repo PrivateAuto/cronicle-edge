@@ -7,9 +7,9 @@
 	"license": "MIT",
 	"main": "lib/main.js",
 	"files": [
-		 "docker-main/docker-compose.yml",
-		 "docker-main/.ebextensions",
-		 "docker-main/.platform"
+		 "docker-compose.yml",
+		 ".ebextensions",
+		 ".platform"
     ],
 	"scripts": {
 		"build": "echo",
