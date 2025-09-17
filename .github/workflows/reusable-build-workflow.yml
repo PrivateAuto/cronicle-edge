@@ -119,7 +119,7 @@ jobs:
           docker image tag ${REG}:${TAG} ${REG}:latest
 
       - name: Push Docker
-        if: env.has_docker == 'true'
+        # if: env.has_docker == 'true'
         working-directory: ${{ inputs.project-dir }}
         run: |
           REG="${{ inputs.registry-id }}.dkr.ecr.${{ inputs.region }}.amazonaws.com/${{  env.PROJECT_NAME }}"
