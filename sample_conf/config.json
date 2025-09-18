@@ -1,8 +1,10 @@
 {
   "base_app_url": "http://localhost:3012",
-  "email_from": "admin@cronicle.com",
-  "smtp_hostname": "mailrelay.cronicle.com",
-  "smtp_port": 25,
+  "email_from": "ssm://cronicle/send_email_from",
+  "smtp_hostname": "ssm://cronicle/send_email_smtphost",
+  "smtp_port": "ssm://cronicle/send_email_port",
+  "smtp_username": "ssm://cronicle/send_email_user",
+  "smtp_password": "ssm://cronicle/send_email_pass",
   "max_emails_per_day": 0,
   "secret_key": "ssm://cronicle/secret_key",
   "ad_domain": "corp.cronicle.com",
