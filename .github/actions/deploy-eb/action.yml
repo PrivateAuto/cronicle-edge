@@ -21,7 +21,7 @@ inputs:
   timeout-minutes:
     description: 'Timeout in minutes for waiting operations'
     required: false
-    default: '10'
+    default: '20'
   aws-region:
     description: 'AWS region for Elastic Beanstalk'
     required: false
