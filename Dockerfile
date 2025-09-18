@@ -23,7 +23,7 @@ ARG BUILDPLATFORM
 RUN echo "Building for $TARGETPLATFORM on $BUILDPLATFORM"
 
 RUN apt update \
-  && apt-get install -y gnupg less git curl ca-certificates apt-transport-https build-essential vim bash procps tail \
+  && apt-get install -y gnupg less git curl ca-certificates apt-transport-https build-essential vim bash procps \
   net-tools iputils-ping xz-utils sudo zip unzip bzip2 python3 python3-pip python3-boto3  sendemail mailutils libnet-ssleay-perl \
   libio-socket-ssl-perl jq tzdata gettext tini mandoc
 
