@@ -188,7 +188,7 @@ stream.on('json', async (job) => {
           domainOwner: ACCOUNT_ID,
           repository: REPOSITORY_NAME,
           format: 'generic',
-          namespace: 'api',
+          namespace: 'job',
           package: name,
           packageVersion: version,
           asset: assetName
