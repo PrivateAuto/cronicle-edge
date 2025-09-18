@@ -112,6 +112,7 @@ export interface EBProps {
   instanceAWSPolicies?: string[];
   instanceInlinePolicies?: PolicyStatement[];
   publicInstances?: boolean;
+  rootVolumeSize?: number;
 }
 
 const DEFAULTS: Partial<EBProps> = {
@@ -284,6 +285,10 @@ export class ElasticBeanstalkDocker extends Construct {
             SecurityGroups: props.securityGroups
               .map((sg) => sg.securityGroupId)
               .join(","),
+            ...(props.rootVolumeSize && {
+              RootVolumeSize: String(props.rootVolumeSize),
+              RootVolumeType: "gp3"
+            }),
           },
           asg: {
             MinSize: String(props.minOnDemand ?? 1),

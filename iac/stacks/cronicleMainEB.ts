@@ -16,7 +16,9 @@ export async function cronicleMainEB(ctx: StackContext, vpcName: string = VPC_NA
       ...shared.ebProps,
       // sourcePath: "docker-main",
       subdomain: ["batch"],
-      minOnDemand: 1
+      maxOnDemand: 1,
+      minOnDemand: 1,
+      rootVolumeSize: 20
     }
   );
 
