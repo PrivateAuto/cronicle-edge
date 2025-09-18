@@ -89,4 +89,4 @@ WORKDIR /opt/cronicle
 # protect sensitive folders
 RUN  mkdir -p /opt/cronicle/data /opt/cronicle/conf && chmod 0700 /opt/cronicle/data /opt/cronicle/conf
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--", "./bin/manager"]
