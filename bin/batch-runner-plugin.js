@@ -171,7 +171,7 @@ stream.on('json', async (job) => {
     
     // Try different asset name formats that might exist in CodeArtifact
     const possibleAssetNames = [
-      `${name}-v${version}.tgz`,
+      `${name}-v${version}.zip`,
       // `${name}.zip`,
       // `${name}-${version}.zip`,
       // 'package.zip',
