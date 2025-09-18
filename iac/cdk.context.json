@@ -1,0 +1,136 @@
+{
+  "vpc-provider:account=337636387741:filter.tag:Name=pa-net-vpc:region=us-east-2:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0aba33d47e35cde06",
+    "vpcCidrBlock": "10.3.0.0/16",
+    "ownerAccountId": "337636387741",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Private",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-0350f72e01f6e7c50",
+            "cidr": "10.3.96.0/19",
+            "availabilityZone": "us-east-2a",
+            "routeTableId": "rtb-040cbdd677d2cef2e"
+          },
+          {
+            "subnetId": "subnet-0c5b7d5af05bf7e6f",
+            "cidr": "10.3.128.0/19",
+            "availabilityZone": "us-east-2b",
+            "routeTableId": "rtb-040cbdd677d2cef2e"
+          },
+          {
+            "subnetId": "subnet-0091433bd069afac6",
+            "cidr": "10.3.160.0/19",
+            "availabilityZone": "us-east-2c",
+            "routeTableId": "rtb-040cbdd677d2cef2e"
+          }
+        ]
+      },
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0306a68ff6acbbd29",
+            "cidr": "10.3.0.0/19",
+            "availabilityZone": "us-east-2a",
+            "routeTableId": "rtb-017a7d8099c121760"
+          },
+          {
+            "subnetId": "subnet-0a24dec58ac912ea6",
+            "cidr": "10.3.32.0/19",
+            "availabilityZone": "us-east-2b",
+            "routeTableId": "rtb-017a7d8099c121760"
+          },
+          {
+            "subnetId": "subnet-0ebfa07c8950db456",
+            "cidr": "10.3.64.0/19",
+            "availabilityZone": "us-east-2c",
+            "routeTableId": "rtb-017a7d8099c121760"
+          }
+        ]
+      }
+    ]
+  },
+  "load-balancer:account=337636387741:loadBalancerTags.0.key=pa-use:loadBalancerTags.0.value=pa-external-lb:loadBalancerType=application:region=us-east-2": {
+    "loadBalancerArn": "arn:aws:elasticloadbalancing:us-east-2:337636387741:loadbalancer/app/pa-external-lb/d1d0332d153c0eea",
+    "loadBalancerCanonicalHostedZoneId": "Z3AADJGX6KTTL2",
+    "loadBalancerDnsName": "pa-external-lb-3677735.us-east-2.elb.amazonaws.com",
+    "vpcId": "vpc-0aba33d47e35cde06",
+    "securityGroupIds": [
+      "sg-0788cf340905b6efa"
+    ],
+    "ipAddressType": "ipv4"
+  },
+  "security-group:account=337636387741:region=us-east-2:securityGroupName=allAllowOut:vpcId=vpc-0aba33d47e35cde06": {
+    "securityGroupId": "sg-023a061e11706c1ce",
+    "allowAllOutbound": true
+  },
+  "security-group:account=337636387741:region=us-east-2:securityGroupName=allAllowV4From10:vpcId=vpc-0aba33d47e35cde06": {
+    "securityGroupId": "sg-057d757d9b8ee89e3",
+    "allowAllOutbound": false
+  },
+  "vpc-provider:account=337636387741:filter.vpc-id=vpc-0aba33d47e35cde06:region=us-east-2:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0aba33d47e35cde06",
+    "vpcCidrBlock": "10.3.0.0/16",
+    "ownerAccountId": "337636387741",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Private",
+        "type": "Private",
+        "subnets": [
+          {
+            "subnetId": "subnet-0350f72e01f6e7c50",
+            "cidr": "10.3.96.0/19",
+            "availabilityZone": "us-east-2a",
+            "routeTableId": "rtb-040cbdd677d2cef2e"
+          },
+          {
+            "subnetId": "subnet-0c5b7d5af05bf7e6f",
+            "cidr": "10.3.128.0/19",
+            "availabilityZone": "us-east-2b",
+            "routeTableId": "rtb-040cbdd677d2cef2e"
+          },
+          {
+            "subnetId": "subnet-0091433bd069afac6",
+            "cidr": "10.3.160.0/19",
+            "availabilityZone": "us-east-2c",
+            "routeTableId": "rtb-040cbdd677d2cef2e"
+          }
+        ]
+      },
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-0306a68ff6acbbd29",
+            "cidr": "10.3.0.0/19",
+            "availabilityZone": "us-east-2a",
+            "routeTableId": "rtb-017a7d8099c121760"
+          },
+          {
+            "subnetId": "subnet-0a24dec58ac912ea6",
+            "cidr": "10.3.32.0/19",
+            "availabilityZone": "us-east-2b",
+            "routeTableId": "rtb-017a7d8099c121760"
+          },
+          {
+            "subnetId": "subnet-0ebfa07c8950db456",
+            "cidr": "10.3.64.0/19",
+            "availabilityZone": "us-east-2c",
+            "routeTableId": "rtb-017a7d8099c121760"
+          }
+        ]
+      }
+    ]
+  },
+  "security-group:account=337636387741:region=us-east-2:securityGroupId=sg-0788cf340905b6efa": {
+    "securityGroupId": "sg-0788cf340905b6efa",
+    "allowAllOutbound": false
+  }
+}

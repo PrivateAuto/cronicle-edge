@@ -1,0 +1,23 @@
+{
+  "version": "2025.0618.0000-abcdexh",
+  "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.864.0",
+    "@aws-sdk/client-ecs": "^3.864.0",
+    "@aws-sdk/client-elastic-beanstalk": "^3.830.0",
+    "@aws-sdk/client-s3": "^3.835.0",
+    "@aws-sdk/client-ssm": "^3.835.0",
+    "@aws-sdk/client-sts": "^3.835.0",
+    "@privateauto/pa-sst2": "^1.0.32",
+    "aws-cdk-lib": "^2.204.0",
+    "constructs": "^10.4.2",
+    "sst": "2",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@aws-cdk/cli-plugin-contract": "^2",
+    "@swc/cli": "^0.7.7",
+    "@swc/core": "^1.12.7",
+    "@types/node": "^24.0.10"
+  },
+  "scripts": {}
+}
