@@ -31,6 +31,54 @@ docker build -t cronicle/edge -f Dockerfile .
 ```
 Instead of using tini as entrypoint you can use Docker's --init option.
 
+## Smart Manager/Worker Selection
+
+The Docker image includes a smart startup script that automatically determines whether a container should become a manager or worker based on existing infrastructure:
+
+### Default Behavior (Smart Mode)
+```bash
+# First container - becomes manager automatically
+docker run -p 3012:3012 cronicle/edge:latest
+
+# Second container - becomes worker automatically
+docker run -p 3013:3012 cronicle/edge:latest
+
+# Third container - becomes worker automatically
+docker run -p 3014:3012 cronicle/edge:latest
+```
+
+### Force Manager Mode
+Use when you want to replace an existing manager (⚠️ **Warning**: This will orphan existing managers):
+```bash
+docker run -p 3012:3012 -e CRONICLE_FORCE_MANAGER=1 cronicle/edge:latest
+```
+
+### Force Worker Mode
+Use when you always want a container to be a worker:
+```bash
+docker run -p 3015:3012 -e CRONICLE_FORCE_WORKER=1 cronicle/edge:latest
+```
+
+### How It Works
+- **Smart Detection**: The startup script checks the storage backend for existing servers
+- **Connectivity Testing**: Pings each existing server to verify it's actually alive and responding
+- **Manager Creation**: If no live manager exists, the container becomes manager with `--reset`
+- **Worker Creation**: If a live manager is found, the container becomes a worker
+- **Dead Server Cleanup**: Ignores servers that are registered but not responding
+- **Prevents Orphaning**: Multiple containers won't accidentally create competing managers
+- **Robust Failover**: Automatically promotes to manager if existing managers are down
+- **Backwards Compatible**: Still supports explicit manager/worker commands
+
+### Manual Override
+You can still use the traditional explicit commands:
+```bash
+# Explicit manager (with reset)
+docker run -p 3012:3012 cronicle/edge:latest ./bin/manager --reset
+
+# Explicit worker
+docker run -p 3013:3012 cronicle/edge:latest ./bin/worker
+```
+
 # Building locally / on VM (linux/windows)
 
 ```bash

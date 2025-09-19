@@ -5,8 +5,16 @@
 # docker build --no-cache -t cronicle:bundle -f Dockerfile .
 # docker tag cronicle:bundle cronicle/cronicle:edge
 #
-# Test run: docker run --rm -it -p 3019:3012 -e CRONICLE_manager=1 cronicle:bundle bash
-# then type manager or worker
+# Test run: docker run --rm -it -p 3019:3012 cronicle:bundle bash
+#
+# Smart mode (default - becomes manager if none exists, otherwise worker):
+# docker run --rm -it -p 3012:3012 cronicle:bundle
+#
+# Force manager mode (always becomes manager, even if one exists):
+# docker run --rm -it -p 3012:3012 -e CRONICLE_FORCE_MANAGER=1 cronicle:bundle
+#
+# Force worker mode (always becomes worker):
+# docker run --rm -it -p 3012:3012 -e CRONICLE_FORCE_WORKER=1 cronicle:bundle
 
 # cronicle/base-alpine: 
 # FROM alpine:3.19.1
@@ -66,7 +74,9 @@ WORKDIR /opt/build
 
 RUN rm -rf node_modules \
   && npm i \
-  && ./bundle /opt/cronicle --s3 --tools
+  && ./bundle /opt/cronicle --s3 --tools \
+  && chmod +x smart-manager.sh \
+  && cp smart-manager.sh /opt/cronicle/bin/smart-manager
 
 # non root user for shell plugin
 ARG CRONICLE_UID=2000
@@ -91,4 +101,4 @@ RUN  mkdir -p /opt/cronicle/data /opt/cronicle/conf && chmod 0700 /opt/cronicle/
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
-CMD ["./bin/manager"]
+CMD ["./bin/smart-manager"]
