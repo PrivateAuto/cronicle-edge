@@ -1,35 +1,46 @@
 {
   "id": "batch-runner",
-  "title": "Batch Runner",
+  "title": "AWS Batch Runner",
   "command": "node bin/batch-runner-plugin.js",
   "enabled": 1,
   "params": [
     {
       "id": "name",
-      "title": "Job Name",
+      "title": "Package Name",
       "type": "text",
-      "required": 1
+      "required": 1,
+      "description": "Name of the package in CodeArtifact repository"
     },
     {
       "id": "version",
-      "title": "Version",
+      "title": "Package Version",
       "type": "text",
-      "required": 1
+      "required": 1,
+      "description": "Version of the package to download (e.g., 2025.0918.0190-e211537)"
     },
     {
       "id": "environment",
-      "title": "Environment",
+      "title": "AWS Environment",
       "type": "select",
       "items": ["padev", "privateauto"],
       "default": "padev",
-      "required": 1
+      "required": 1,
+      "description": "AWS environment to assume IAM role for"
     },
     {
-      "id": "command",
-      "title": "Command",
+      "id": "script",
+      "title": "Script",
       "type": "text",
       "multi": 1,
-      "required": 1
+      "required": 1,
+      "placeholder": "#!/bin/bash\necho 'Starting batch job...'\n# Your multiline bash script here"
+    },
+    {
+      "id": "annotate",
+      "title": "Annotate Log Lines",
+      "type": "checkbox",
+      "value": 0,
+      "description": "Add timestamps to each log line"
     }
   ]
 }

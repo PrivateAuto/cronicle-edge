@@ -722,37 +722,6 @@
       }
     ],
 
-    [
-      "listPush",
-      "global/conf_keys",
-      {
-        "id": "batch-runner",
-        "title": "Batch Runner",
-        "enabled": 1,
-        "command": "node bin/batch-runner-plugin.js",
-        "username": "admin",
-        "modified": 1434125333,
-        "created": 1434125333,
-        "params": {
-          "name": { "title": "Job Name", "type": "text", "required": 1 },
-          "version": { "title": "Version", "type": "text", "required": 1 },
-          "environment": {
-            "title": "Environment",
-            "type": "select",
-            "items": ["padev", "privateauto"],
-            "default": "padev",
-            "required": 1
-          },
-          "command": {
-            "title": "Command",
-            "type": "text",
-            "multi": 1,
-            "required": 1
-          }
-        }
-      }
-    ],
-
     ["listCreate", "global/categories", {}],
     [
       "listPush",

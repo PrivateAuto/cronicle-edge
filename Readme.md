@@ -188,10 +188,11 @@ Enhanced HTTP client for making web requests with advanced features.
 
 ### 🔄 Batch Runner Plugin (`batch-runner-plugin.js`)
 Execute code packages from AWS CodeArtifact with IAM role assumption.
-- **Features**: Downloads packages from CodeArtifact, assumes IAM roles, executes with AWS credentials
-- **Use Cases**: CI/CD pipelines, AWS batch jobs, multi-environment deployments
+- **Features**: Downloads packages from CodeArtifact, assumes IAM roles, executes multiline bash scripts with AWS credentials
+- **Use Cases**: CI/CD pipelines, AWS batch jobs, multi-environment deployments, complex automation workflows
 - **Supported Formats**: Both `.zip` and `.tgz` packages
-- **Parameters**: `name`, `version`, `environment`, `command`, `annotate`
+- **Script Execution**: Creates temporary script files with proper error handling (`set -e`, `set -u`, `set -o pipefail`)
+- **Parameters**: `name`, `version`, `environment`, `script`, `annotate`
 
 ### 🔐 Enhanced SSH Plugin (`sshx-plugin.js`)
 Advanced SSH execution with extended features beyond the standard SSH plugin.

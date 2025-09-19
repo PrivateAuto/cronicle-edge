@@ -6,7 +6,7 @@
  *   - name (string): Job name; used to find the generic package in CodeArtifact.
  *   - version (string): Version; used to find the generic package in CodeArtifact.
  *   - environment (string enum): "padev" | "privateauto" — selects IAM role to assume.
- *   - command (string): Command to execute inside the extracted code, via bash -lc "<command>".
+ *   - script (string): Multiline bash script to execute inside the extracted code directory.
  *   - annotate (boolean): If true, annotates log lines with date.
  *
  * Behavior:
@@ -14,7 +14,7 @@
  *   - Assumes an IAM role based on the `environment` using an internal ROLE_MAP.
  *   - Downloads code from CodeArtifact as a generic package using {name}/{version}.
  *   - Extracts into a temp working directory.
- *   - Executes the provided command with bash (cwd = extraction root) with assumed-role AWS creds in env.
+ *   - Creates a temporary script file and executes it with bash (cwd = extraction root) with assumed-role AWS creds in env.
  *   - Streams stdout/stderr into Cronicle's job log and forwards progress updates (e.g., lines like "42%").
  *
  * Update the constants DOMAIN_NAME, REPOSITORY_NAME and ROLE_MAP to match your AWS account(s).
@@ -69,11 +69,14 @@ function fail(job, message) {
   stream.write({ complete: 1, code: 1, description: message });
 }
 
-// Utility: cleanup working directory
-function cleanupWorkDir(workDir) {
-  try { 
+// Utility: cleanup working directory and script file
+function cleanupWorkDir(workDir, scriptPath = null) {
+  try {
+    if (scriptPath && fs.existsSync(scriptPath)) {
+      fs.unlinkSync(scriptPath);
+    }
     if (fs.existsSync(workDir)) {
-      fs.rmSync(workDir, { recursive: true, force: true }); 
+      fs.rmSync(workDir, { recursive: true, force: true });
     }
   }
   catch (e) { /* ignore cleanup errors */ }
@@ -91,13 +94,13 @@ stream.on('json', async (job) => {
   const name = String(params.name || '').trim();
   const version = String(params.version || '').trim();
   const environment = String(params.environment || '').trim();
-  const command = String(params.command || '').trim();
+  const script = String(params.script || '').trim();
   const annotate = Boolean(params.annotate);
 
   if (!name) return failWithCleanup(job, "Missing required parameter name", null);
   if (!version) return failWithCleanup(job, "Missing required parameter version", null);
   if (!environment) return failWithCleanup(job, "Missing required parameter environment", null);
-  if (!command) return failWithCleanup(job, "Missing required parameter command", null);
+  if (!script) return failWithCleanup(job, "Missing required parameter script", null);
   if (!DOMAIN_NAME || DOMAIN_NAME.startsWith("REPLACE_ME_")) return failWithCleanup(job, "DOMAIN_NAME is not configured. Set CRONICLE_BATCH_DOMAIN env var or edit plugin.", null);
   if (!REPOSITORY_NAME || REPOSITORY_NAME.startsWith("REPLACE_ME_")) return failWithCleanup(job, "REPOSITORY_NAME is not configured. Set CRONICLE_BATCH_REPOSITORY env var or edit plugin.", null);
   if (!ROLE_MAP[environment]) return failWithCleanup(job, `Invalid environment ${environment}`, null);
@@ -265,7 +268,26 @@ stream.on('json', async (job) => {
     return failWithCleanup(job, `Package extraction failed: ${e.message}`, workDir);
   }
 
-  // 5) Execute command with bash -lc in working dir
+  // 5) Create temporary script file and execute with bash in working dir
+  const scriptPath = path.join(workDir, `cronicle-batch-script-${job.id}.sh`);
+
+  try {
+    // Create script file with proper bash header and the user's script
+    const scriptContent = `#!/bin/bash
+set -e  # Exit on error
+set -u  # Exit on undefined variable
+set -o pipefail  # Exit on pipe failure
+
+# User's script begins here
+${script}
+`;
+
+    fs.writeFileSync(scriptPath, scriptContent, { mode: 0o755 });
+    logAppend(job, `[Cronicle Batch] Created script file: ${path.basename(scriptPath)}`);
+  } catch (e) {
+    return failWithCleanup(job, `Failed to create script file: ${e.message}`, workDir);
+  }
+
   const childEnv = {
     ...process.env,
     AWS_ACCESS_KEY_ID: assumedRole.AccessKeyId,
@@ -277,7 +299,7 @@ stream.on('json', async (job) => {
   let stderrBuffer = "";
   let sentHtml = false;
 
-  const child = cp.spawn('bash', ['-lc', command], {
+  const child = cp.spawn('bash', [scriptPath], {
     cwd: workDir,
     env: childEnv,
     stdio: ['pipe', 'pipe', 'pipe']
@@ -322,11 +344,11 @@ stream.on('json', async (job) => {
 
   child.on('error', (err) => {
     const errorDesc = Tools.getErrorDescription(err);
-    logAppend(job, `Command error: ${errorDesc}`);
+    logAppend(job, `Script error: ${errorDesc}`);
     stream.write({
       complete: 1,
       code: 1,
-      description: "Command failed: " + errorDesc
+      description: "Script failed: " + errorDesc
     });
   });
 
@@ -337,7 +359,7 @@ stream.on('json', async (job) => {
     const data = {
       complete: 1,
       code: code,
-      description: code ? ("Command exited with code: " + code) : ""
+      description: code ? ("Script exited with code: " + code) : ""
     };
 
     if (stderrBuffer.trim()) {
@@ -350,7 +372,7 @@ stream.on('json', async (job) => {
 
     stream.write(data);
 
-    cleanupWorkDir(workDir);
+    cleanupWorkDir(workDir, scriptPath);
   });
 
   // Pass job down to child (harmless for bash; helpful for other interpreters)
