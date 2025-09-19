@@ -112,6 +112,9 @@ stream.on('json', async (job) => {
   logAppend(job, `[Cronicle Batch] Starting job id=${job.id} name=${name} version=${version}`);
   logAppend(job, `[Cronicle Batch] Using CodeArtifact domain: ${DOMAIN_NAME}, repository: ${REPOSITORY_NAME}, package: ${packageKey}`);
 
+  // Variables for package download and extraction
+  let usedAssetName = null;
+
   // 1) Assume IAM role
   let assumedRole;
   try {
@@ -192,7 +195,6 @@ stream.on('json', async (job) => {
     ];
     
     let resp = null;
-    let usedAssetName = null;
     let attemptedAssets = [];
 
     for (const assetName of possibleAssetNames) {
@@ -307,7 +309,8 @@ stream.on('json', async (job) => {
   });
 
   cstream.on('error', (err, text) => {
-    if (text) logAppend(job, text);
+    const errorMsg = text || `Stream error: ${err.message || err}`;
+    logAppend(job, errorMsg);
   });
 
   child.stderr.setEncoding('utf8');
