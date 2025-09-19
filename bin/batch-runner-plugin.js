@@ -26,7 +26,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const cp = require('child_process');
-const { pipeline } = require('stream');
 const { promisify } = require('util');
 const JSONStream = require('pixl-json-stream');
 const Tools = require('pixl-tools');
@@ -36,7 +35,6 @@ const unzipper = require('unzipper');
 const tar = require('tar');
 const fetch = require('node-fetch');
 
-const streamPipeline = promisify(pipeline);
 
 // ====== EDIT THESE FOR YOUR ENVIRONMENT ======
 const DOMAIN_NAME = process.env.CRONICLE_BATCH_DOMAIN || "privateauto";
@@ -236,9 +234,19 @@ stream.on('json', async (job) => {
     const fileExtension = usedAssetName.endsWith('.zip') ? '.zip' : '.tgz';
     const packageFilePath = packagePath + fileExtension;
 
-    const packageFile = fs.createWriteStream(packageFilePath);
-    await streamPipeline(resp.asset, packageFile);
-    logAppend(job, `[Cronicle Batch] Downloaded package from CodeArtifact using asset: ${usedAssetName}`);
+    // Download the package with better error handling
+    await new Promise((resolve, reject) => {
+      const packageFile = fs.createWriteStream(packageFilePath);
+
+      packageFile.on('error', reject);
+      packageFile.on('finish', () => {
+        logAppend(job, `[Cronicle Batch] Downloaded package from CodeArtifact using asset: ${usedAssetName}`);
+        resolve();
+      });
+
+      resp.asset.on('error', reject);
+      resp.asset.pipe(packageFile);
+    });
   } catch (e) {
     return failWithCleanup(job, `Failed to download package: ${e.message}`, workDir);
   }
@@ -249,12 +257,25 @@ stream.on('json', async (job) => {
     const fileExtension = usedAssetName.endsWith('.zip') ? '.zip' : '.tgz';
     const packageFilePath = packagePath + fileExtension;
 
+    // Small delay to ensure file system operations are complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Verify file exists and has content
+    const stats = fs.statSync(packageFilePath);
+    if (stats.size === 0) {
+      throw new Error(`Downloaded file is empty: ${packageFilePath}`);
+    }
+    logAppend(job, `[Cronicle Batch] Verifying package file: ${stats.size} bytes`);
+
     if (fileExtension === '.zip') {
-      // Extract zip file
-      await streamPipeline(
-        fs.createReadStream(packageFilePath),
-        unzipper.Extract({ path: workDir })
-      );
+      // Extract zip file with better error handling
+      await new Promise((resolve, reject) => {
+        fs.createReadStream(packageFilePath)
+          .pipe(unzipper.Extract({ path: workDir }))
+          .on('error', reject)
+          .on('close', resolve)
+          .on('finish', resolve);
+      });
       logAppend(job, `[Cronicle Batch] Extracted ZIP package into ${workDir}`);
     } else {
       // Extract tar.gz file
