@@ -1,13 +1,8 @@
 #!/usr/bin/env node
 
-// Suppress AWS SDK v2 deprecation warnings
-process.removeAllListeners('warning');
-process.on('warning', (warning) => {
-  if (warning.name === 'DeprecationWarning' && warning.message.includes('AWS SDK for JavaScript (v2)')) {
-    return; // Ignore this specific warning
-  }
-  console.warn(warning.name + ': ' + warning.message);
-});
+// Suppress AWS SDK v2 deprecation warnings at the process level
+process.env.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE = '1';
+process.env.NODE_NO_WARNINGS = '1';
 
 /**
  * Cronicle Plugin: Custom Batch Job Runner
