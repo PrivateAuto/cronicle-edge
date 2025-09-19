@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+
+// Suppress AWS SDK v2 deprecation warnings
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+  if (warning.name === 'DeprecationWarning' && warning.message.includes('AWS SDK for JavaScript (v2)')) {
+    return; // Ignore this specific warning
+  }
+  console.warn(warning.name + ': ' + warning.message);
+});
+
 /**
  * Cronicle Plugin: Custom Batch Job Runner
  *
@@ -26,14 +36,12 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const cp = require('child_process');
-const { promisify } = require('util');
 const JSONStream = require('pixl-json-stream');
 const Tools = require('pixl-tools');
 const { STSClient, AssumeRoleCommand } = require('@aws-sdk/client-sts');
 const { CodeartifactClient, GetAuthorizationTokenCommand, GetPackageVersionAssetCommand } = require('@aws-sdk/client-codeartifact');
 const unzipper = require('unzipper');
 const tar = require('tar');
-const fetch = require('node-fetch');
 
 
 // ====== EDIT THESE FOR YOUR ENVIRONMENT ======
@@ -136,7 +144,6 @@ stream.on('json', async (job) => {
 
 
   // 2) Get authorization token for CodeArtifact
-  let token;
   try {
     const codeartifact = new CodeartifactClient({
       region: process.env.AWS_REGION || DEFAULT_REGION,
@@ -148,7 +155,7 @@ stream.on('json', async (job) => {
       domain: DOMAIN_NAME,
       domainOwner: ACCOUNT_ID,
     });
-    
+
     const resp = await codeartifact.send(new GetAuthorizationTokenCommand({
       region: process.env.AWS_REGION || DEFAULT_REGION,
       domain: DOMAIN_NAME,
@@ -156,7 +163,6 @@ stream.on('json', async (job) => {
       durationSeconds: 0
     }));
     if (!resp.authorizationToken) throw new Error("No authorization token returned from CodeArtifact");
-    token = resp.authorizationToken;
     logAppend(job, `[Cronicle Batch] Got authorization token for CodeArtifact.`);
   } catch (e) {
     return failWithCleanup(job, `GetAuthorizationToken failed!: ${e.message}`, workDir);
