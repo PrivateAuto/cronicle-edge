@@ -171,11 +171,15 @@ stream.on('json', async (job) => {
     
     // Try different asset name formats that might exist in CodeArtifact
     const possibleAssetNames = [
+      `${name}-${version}.zip`,
       `${name}-v${version}.zip`,
-      // `${name}.zip`,
-      // `${name}-${version}.zip`,
-      // 'package.zip',
-      // 'asset.zip'
+      `${name}.zip`,
+      `${name}-${version}.tgz`,
+      `${name}-v${version}.tgz`,
+      'package.zip',
+      'package.tgz',
+      'asset.zip',
+      'asset.tgz'
     ];
     
     let resp = null;
@@ -206,8 +210,12 @@ stream.on('json', async (job) => {
     if (!resp || !resp.asset) {
       throw new Error(`No asset found. Tried: ${possibleAssetNames.join(', ')}`);
     }
-    
-    const packageFile = fs.createWriteStream(packagePath + '.tgz');
+
+    // Determine file extension based on the asset name
+    const fileExtension = usedAssetName.endsWith('.zip') ? '.zip' : '.tgz';
+    const packageFilePath = packagePath + fileExtension;
+
+    const packageFile = fs.createWriteStream(packageFilePath);
     await streamPipeline(resp.asset, packageFile);
     logAppend(job, `[Cronicle Batch] Downloaded package from CodeArtifact using asset: ${usedAssetName}`);
   } catch (e) {
@@ -216,13 +224,27 @@ stream.on('json', async (job) => {
 
   // 4) Extract package
   try {
-    await tar.x({
-      file: packagePath + '.tgz',
-      cwd: workDir
-    });
-    logAppend(job, `[Cronicle Batch] Extracted package into ${workDir}`);
+    // Determine file extension and extract accordingly
+    const fileExtension = usedAssetName.endsWith('.zip') ? '.zip' : '.tgz';
+    const packageFilePath = packagePath + fileExtension;
+
+    if (fileExtension === '.zip') {
+      // Extract zip file
+      await streamPipeline(
+        fs.createReadStream(packageFilePath),
+        unzipper.Extract({ path: workDir })
+      );
+      logAppend(job, `[Cronicle Batch] Extracted ZIP package into ${workDir}`);
+    } else {
+      // Extract tar.gz file
+      await tar.x({
+        file: packageFilePath,
+        cwd: workDir
+      });
+      logAppend(job, `[Cronicle Batch] Extracted TAR package into ${workDir}`);
+    }
   } catch (e) {
-    return failWithCleanup(job, `Tar extraction failed: ${e.message}`, workDir);
+    return failWithCleanup(job, `Package extraction failed: ${e.message}`, workDir);
   }
 
   // 5) Execute command with bash -lc in working dir
@@ -280,10 +302,12 @@ stream.on('json', async (job) => {
   });
 
   child.on('error', (err) => {
+    const errorDesc = Tools.getErrorDescription(err);
+    logAppend(job, `Command error: ${errorDesc}`);
     stream.write({
       complete: 1,
       code: 1,
-      description: "Command failed: " + Tools.getErrorDescription(err)
+      description: "Command failed: " + errorDesc
     });
   });
 

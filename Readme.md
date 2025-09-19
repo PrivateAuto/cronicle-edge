@@ -164,6 +164,92 @@ Use this plugin to run multiple jobs in parallel, or invoke same event multiple 
 ### SSH Plugin
 Run your code snippets on remote machines over SSH. No cronicle agent or openssh installation needed! Can even run on Windows hosts (if openssh is configured). Use with WF plugin to run on multiple hosts.
 
+## Custom Plugins
+
+Cronicle-edge includes several additional custom plugins that extend functionality beyond the standard shell, HTTP, and workflow plugins:
+
+### 🐳 Docker Plugin (`docker-plugin.js`)
+Execute commands inside Docker containers directly from Cronicle jobs.
+- **Features**: Run containers, execute commands, manage volumes and networking
+- **Use Cases**: Containerized job execution, isolated environments, microservice operations
+- **Dependencies**: Requires Docker daemon and `dockerode` npm package
+
+### 🗄️ MongoDB Shell Plugin (`mongosh-plugin.js`)
+Execute MongoDB operations using the modern `mongosh` shell.
+- **Features**: Run inline scripts, execute files, or use `--eval` mode
+- **Use Cases**: Database maintenance, data migration, administrative tasks
+- **Dependencies**: Requires `mongosh` binary installed on the system
+
+### 🌐 URL/HTTP Client Plugin (`url-plugin.js`)
+Enhanced HTTP client for making web requests with advanced features.
+- **Features**: Custom headers, SSL certificate handling, response matching, timeouts
+- **Use Cases**: API testing, health checks, webhook triggers, data synchronization
+- **Parameters**: `method`, `url`, `headers`, `data`, `timeout`, `follow`, `ssl_cert_bypass`, `success_match`, `error_match`
+
+### 🔄 Batch Runner Plugin (`batch-runner-plugin.js`)
+Execute code packages from AWS CodeArtifact with IAM role assumption.
+- **Features**: Downloads packages from CodeArtifact, assumes IAM roles, executes with AWS credentials
+- **Use Cases**: CI/CD pipelines, AWS batch jobs, multi-environment deployments
+- **Supported Formats**: Both `.zip` and `.tgz` packages
+- **Parameters**: `name`, `version`, `environment`, `command`, `annotate`
+
+### 🔐 Enhanced SSH Plugin (`sshx-plugin.js`)
+Advanced SSH execution with extended features beyond the standard SSH plugin.
+- **Features**: Enhanced connection handling, key management, advanced options
+- **Use Cases**: Complex remote operations, key-based authentication, advanced SSH scenarios
+
+### 🧪 Test Plugin (`test-plugin.js`)
+Development and testing utility for plugin development and debugging.
+- **Features**: Plugin testing framework, debugging utilities
+- **Use Cases**: Plugin development, testing job execution, debugging Cronicle integration
+
+## Plugin Development
+
+### Creating Custom Plugins
+Custom plugins follow the Cronicle plugin contract:
+
+1. **Input**: Read job JSON from STDIN
+2. **Processing**: Execute your custom logic
+3. **Output**: Write progress updates and completion status to STDOUT
+4. **Logging**: Append output to the job log file
+
+### Plugin Contract Example
+```javascript
+#!/usr/bin/env node
+
+const fs = require('fs');
+const JSONStream = require('pixl-json-stream');
+
+// Setup JSON communication with Cronicle
+const stream = new JSONStream(process.stdin, process.stdout);
+
+stream.on('json', (job) => {
+  // Your plugin logic here
+  const params = job.params || {};
+
+  // Log to job file
+  fs.appendFileSync(job.log_file, "Plugin starting...\n");
+
+  // Send progress updates
+  stream.write({ progress: 0.5 });
+
+  // Send completion
+  stream.write({
+    complete: 1,
+    code: 0,
+    description: "Success"
+  });
+});
+```
+
+### Installation
+Place custom plugins in the `bin/` directory and make them executable:
+```bash
+chmod +x bin/my-custom-plugin.js
+```
+
+Then configure them in the Cronicle web interface under Admin → Plugins.
+
 ### Event History Chart
 Main page will include a bar chart showing last N completed jobs. It will help to quickly catch failed or long running jobs. You can set default job count and scale (linear/logarithmic) via `ui.job_chart_limit` and `ui.job_chart_scale` configs.
 
