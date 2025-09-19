@@ -176,17 +176,30 @@ stream.on('json', async (job) => {
       `${name}.zip`,
       `${name}-${version}.tgz`,
       `${name}-v${version}.tgz`,
+      `${name}.tgz`,
+      // Try without the git hash suffix (in case version has commit hash)
+      `${name}-${version.split('-')[0]}.zip`,
+      `${name}-v${version.split('-')[0]}.zip`,
+      `${name}-${version.split('-')[0]}.tgz`,
+      `${name}-v${version.split('-')[0]}.tgz`,
+      // Generic fallbacks
       'package.zip',
       'package.tgz',
       'asset.zip',
-      'asset.tgz'
+      'asset.tgz',
+      'source.zip',
+      'source.tgz'
     ];
     
     let resp = null;
     let usedAssetName = null;
-    
+    let attemptedAssets = [];
+
     for (const assetName of possibleAssetNames) {
       try {
+        logAppend(job, `[Cronicle Batch] Attempting to download asset: ${assetName}`);
+        attemptedAssets.push(assetName);
+
         resp = await codeartifact.send(new GetPackageVersionAssetCommand({
           domain: DOMAIN_NAME,
           domainOwner: ACCOUNT_ID,
@@ -198,17 +211,20 @@ stream.on('json', async (job) => {
           asset: assetName
         }));
         usedAssetName = assetName;
+        logAppend(job, `[Cronicle Batch] Successfully found asset: ${assetName}`);
         break;
       } catch (e) {
         if (e.name === 'ResourceNotFoundException') {
+          logAppend(job, `[Cronicle Batch] Asset not found: ${assetName}`);
           continue; // Try next asset name
         }
+        logAppend(job, `[Cronicle Batch] Error accessing asset ${assetName}: ${e.message}`);
         throw e; // Re-throw other errors
       }
     }
-    
+
     if (!resp || !resp.asset) {
-      throw new Error(`No asset found. Tried: ${possibleAssetNames.join(', ')}`);
+      throw new Error(`No asset found. Tried: ${attemptedAssets.join(', ')}`);
     }
 
     // Determine file extension based on the asset name
