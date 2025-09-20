@@ -95,13 +95,13 @@ stream.on('json', async (job) => {
   const name = String(params.name || '').trim();
   const version = String(params.version || '').trim();
   const environment = String(params.environment || '').trim();
-  const script = String(params.script || '').trim();
+  const script = String(params.script || '');
   const annotate = Boolean(params.annotate);
 
   if (!name) return failWithCleanup(job, "Missing required parameter name", null);
   if (!version) return failWithCleanup(job, "Missing required parameter version", null);
   if (!environment) return failWithCleanup(job, "Missing required parameter environment", null);
-  if (!script) return failWithCleanup(job, "Missing required parameter script", null);
+  if (!script.trim()) return failWithCleanup(job, "Missing required parameter script", null);
   if (!DOMAIN_NAME || DOMAIN_NAME.startsWith("REPLACE_ME_")) return failWithCleanup(job, "DOMAIN_NAME is not configured. Set CRONICLE_BATCH_DOMAIN env var or edit plugin.", null);
   if (!REPOSITORY_NAME || REPOSITORY_NAME.startsWith("REPLACE_ME_")) return failWithCleanup(job, "REPOSITORY_NAME is not configured. Set CRONICLE_BATCH_REPOSITORY env var or edit plugin.", null);
   if (!ROLE_MAP[environment]) return failWithCleanup(job, `Invalid environment ${environment}`, null);
