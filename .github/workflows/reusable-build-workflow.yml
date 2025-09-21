@@ -135,7 +135,7 @@ jobs:
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip"
           export TAG="${{ env.VER }}"
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
-          cd docker-main
+          cd docker-unified
           echo "TAG: $TAG"
           [ -f docker-compose.yml ] && cp docker-compose.yml tmp && envsubst < tmp > docker-compose.yml
           cat docker-compose.yml
