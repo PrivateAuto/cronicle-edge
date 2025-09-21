@@ -12,7 +12,7 @@ services:
       - TZ=America/Chicago
       - CRONICLE_base_app_url=https://batch.paops.xyz
       - CRONICLE_WebServer__http_port=80
-    command: "/opt/cronicle/bin/manager --reset"
+    # command: "/opt/cronicle/bin/manager --reset"
     # command: "tail -f /dev/null"    
 
 #    volumes:
