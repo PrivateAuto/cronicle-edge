@@ -200,10 +200,11 @@ export function addAwsPolicy(r: Role, n: string) {
 export function addManagedPolicy(
   parent: Construct,
   r: Role,
-  p: string | ManagedPolicy
+  p: string | ManagedPolicy,
+  id?: string
 ) {
   const mp = typeof p === "string"
-  ? ManagedPolicy.fromManagedPolicyName(parent, `import-policy-${p}`, p)
+  ? ManagedPolicy.fromManagedPolicyName(parent, `${id ? id+'-' : ''}import-policy-${p}`, p)
   : p
   console.log(`addManagedPolicy(${r.roleName}, ${p}) => `, mp.managedPolicyArn);
   r.addManagedPolicy(mp);
@@ -224,7 +225,7 @@ export function makeIAMRole(
   const params: any = { roleName: id };
   if (principal)
     params.assumedBy = Array.isArray(principal)
-      ? new CompositePrincipal(...principal.map((p) => new ServicePrincipal(p)))
+      ? new CompositePrincipal(...principal.map((p) => new ServicePrincipal(p, { })))
       : typeof principal === "string"
       ? new ServicePrincipal(principal)
       : principal;
@@ -235,7 +236,7 @@ export function makeIAMRole(
   //console.log(`id:`, id);
   //console.log(`makeIAMRole policies:`, policies);
   // policies.forEach((up) => addManagedPolicy(parent, role, `${id}-${up}`));
-  policies.forEach((up) => addManagedPolicy(parent, role, up));
+  policies.forEach((up) => addManagedPolicy(parent, role, up, id));
   // const pols = inline.filter((p) => p instanceof Policy);
   // const pols =  <IPolicy[]> inline.filter((p) => !(p instanceof PolicyStatement));
   // const stmts = <PolicyStatement[]> inline.filter((p) => p instanceof PolicyStatement);

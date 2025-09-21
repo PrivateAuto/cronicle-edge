@@ -1,0 +1,43 @@
+services:
+  cronicle:
+    image: 173305588364.dkr.ecr.us-east-2.amazonaws.com/cronicle:$TAG
+    restart: always
+    network_mode: host
+    environment:
+      # Base configuration
+      - AWS_REGION=${AWS_REGION:-us-east-2}
+      - EFS_ID=${EFS_ID}
+      - TZ=${TZ:-America/Chicago}
+      - CRONICLE_WebServer__http_port=80
+
+      # Environment-specific configuration (passed from IaC deployment)
+      - CRONICLE_base_app_url=${CRONICLE_base_app_url}
+      - CRONICLE_SERVER_GROUP=${CRONICLE_SERVER_GROUP}
+      - CRONICLE_ENVIRONMENT=${CRONICLE_ENVIRONMENT}
+      - WORKER_ENVIRONMENT=${WORKER_ENVIRONMENT}
+      - CRONICLE_CLUSTER_ROLE=${CRONICLE_CLUSTER_ROLE}
+      - CRONICLE_server_comm_use_hostnames=${CRONICLE_server_comm_use_hostnames}
+      - CRONICLE_web_direct_connect=${CRONICLE_web_direct_connect}
+
+    # Uncomment for debugging
+    # command: "/opt/cronicle/bin/manager --reset"
+    # command: "tail -f /dev/null"
+
+    # Optional healthcheck
+    # healthcheck:
+    #   test: ["CMD", "sh", "-c", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 5
+
+    # Optional EFS volumes
+    # volumes:
+    #   - efs-data:/opt/cronicle/data
+
+# Optional EFS volume configuration
+# volumes:
+#   efs-data:
+#     driver_opts:
+#       type: nfs
+#       o: addr=${EFS_ID}.efs.${AWS_REGION:-us-east-2}.amazonaws.com,rw,nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+#       device: :/

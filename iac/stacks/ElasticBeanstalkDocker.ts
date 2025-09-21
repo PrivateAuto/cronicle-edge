@@ -1,25 +1,9 @@
 import { Construct } from "constructs";
-import * as ecs from "aws-cdk-lib/aws-ecs";
 import { IRole, PolicyStatement, Role } from "aws-cdk-lib/aws-iam";
-// import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as efs from "aws-cdk-lib/aws-efs";
-import { RemovalPolicy } from "aws-cdk-lib";
-import * as rds from "aws-cdk-lib/aws-rds";
-import * as elasticache from "aws-cdk-lib/aws-elasticache";
 import * as eb from "aws-cdk-lib/aws-elasticbeanstalk";
 import { execSync } from "child_process";
 import * as path from "path";
-import * as cdk from "aws-cdk-lib";
-import * as fs from "fs";
-import {
-  IVpc,
-  Vpc,
-  ISecurityGroup,
-  SecurityGroup,
-  Port,
-  Peer,
-} from "aws-cdk-lib/aws-ec2";
-import * as sst from "sst";
+import { IVpc, ISecurityGroup } from "aws-cdk-lib/aws-ec2";
 import {
   getVPC,
   importALB,
@@ -27,16 +11,8 @@ import {
   inPortsToSecurityGroups,
   makeIAMRole,
 } from "./utils";
-import {
-  getLastestDockerStack,
-  mapToCfnOptions,
-  makeEBInstanceRole,
-  uploadFileToS3,
-} from "./eb-utils";
-import {
-  IApplicationLoadBalancer,
-  ApplicationLoadBalancer,
-} from "aws-cdk-lib/aws-elasticloadbalancingv2";
+import { mapToCfnOptions, makeEBInstanceRole } from "./eb-utils";
+import { IApplicationLoadBalancer } from "aws-cdk-lib/aws-elasticloadbalancingv2";
 import { CfnInstanceProfile } from "aws-cdk-lib/aws-iam";
 
 const STAGES = {
@@ -102,6 +78,8 @@ export interface EBProps {
   environment?: Record<string, string>;
   options?: Record<string, string>;
   dockerComposeFile?: string;
+  dockerPath?: string;
+  dockerEnvironment?: string;
   sshKeyName?: string;
   minOnDemand?: number;
   maxOnDemand?: number;
@@ -117,6 +95,7 @@ export interface EBProps {
 
 const DEFAULTS: Partial<EBProps> = {
   dockerComposeFile: "docker-compose.yml",
+  dockerPath: "docker-unified",
   //subdomain: ["workflow"],
   pathPatterns: ["*"],
   networkName: "pa-net-vpc",
@@ -287,7 +266,7 @@ export class ElasticBeanstalkDocker extends Construct {
               .join(","),
             ...(props.rootVolumeSize && {
               RootVolumeSize: String(props.rootVolumeSize),
-              RootVolumeType: "gp3"
+              RootVolumeType: "gp3",
             }),
           },
           asg: {
