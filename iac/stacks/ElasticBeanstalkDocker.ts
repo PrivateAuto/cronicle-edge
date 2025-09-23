@@ -95,7 +95,7 @@ export interface EBProps {
 
 const DEFAULTS: Partial<EBProps> = {
   dockerComposeFile: "docker-compose.yml",
-  dockerPath: "docker-unified",
+  dockerPath: "docker-unified", // Contains platform hooks that handle DNS/ALB failures gracefully
   //subdomain: ["workflow"],
   pathPatterns: ["*"],
   networkName: "pa-net-vpc",
@@ -164,9 +164,8 @@ export class ElasticBeanstalkDocker extends Construct {
 
     const policies = [
       "pa-apiBasicAccess-policy",
-      "pa-s3ReadOnlyAccess-policy",
       "pa-s3FullAccess-policy",
-      "pa-sqsFullAccess-policy",
+      "pa-ssmAccess-policy",
     ];
 
     // props.domain ?? stageValues.domain;

@@ -151,8 +151,8 @@ export async function cronicleMainEB(ctx: StackContext, vpcName: string = VPC_NA
   const outputs: { [key: string]: string } = {};
 
   if (config.cronicleRole === "master") {
-    // Main Cluster: Deploy master and all environment-specific workers
-    console.log(`Deploying MAIN cluster for environment: ${config.name}`);
+    // Master Cluster: Deploy only the master server
+    console.log(`Deploying MASTER cluster for environment: ${config.name}`);
 
     // Main EB Environment (Master/Primary)
     mainEb = await ElasticBeanstalkDocker.make(
@@ -173,46 +173,6 @@ export async function cronicleMainEB(ctx: StackContext, vpcName: string = VPC_NA
       }
     );
     outputs.MainUrl = mainEb.url;
-
-    // PrivateAuto Worker
-    const privateautoWorker = await ElasticBeanstalkDocker.make(
-      stack,
-      `${STACKNAME}-worker-privateauto`,
-      {
-        ...ebProps,
-        dockerEnvironment: "privateauto",
-        subdomain: ["batch-worker-privateauto"],
-        maxOnDemand: 2,
-        minOnDemand: 1,
-        rootVolumeSize: 20,
-        environment: {
-          ...ebProps.environment,
-          ...getCronicleEnvironmentVars(accountId, "worker", "privateauto"),
-          CRONICLE_server_comm_use_hostnames: CRONICLE_COMM_USE_HOSTNAMES,
-        }
-      }
-    );
-    workers.privateauto = privateautoWorker;
-
-    // Dev Worker (padev environment)
-    const devWorker = await ElasticBeanstalkDocker.make(
-      stack,
-      `${STACKNAME}-worker-dev`,
-      {
-        ...ebProps,
-        dockerEnvironment: "dev",
-        subdomain: ["batch-worker-dev"],
-        maxOnDemand: 2,
-        minOnDemand: 1,
-        rootVolumeSize: 20,
-        environment: {
-          ...ebProps.environment,
-          ...getCronicleEnvironmentVars(accountId, "worker", "dev"),
-          CRONICLE_server_comm_use_hostnames: CRONICLE_COMM_USE_HOSTNAMES,
-        }
-      }
-    );
-    workers.dev = devWorker;
 
   } else if (config.cronicleRole === "worker") {
     // Worker Cluster: Deploy only worker nodes for this specific environment

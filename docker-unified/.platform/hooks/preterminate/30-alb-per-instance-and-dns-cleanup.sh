@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
+
+# Function to log errors and continue
+log_error() {
+    echo "ERROR: $1" >&2
+    echo "WARNING: Continuing cleanup despite error" >&2
+}
+
+# Function to run commands with error handling
+run_safe() {
+    if ! "$@"; then
+        log_error "Command failed: $*"
+        return 1
+    fi
+    return 0
+}
 
 DOMAIN="${DOMAIN:-batch.paops.xyz}"
 PRIVATE_ZONE_ID="${PRIVATE_ZONE_ID:-}"
@@ -83,22 +98,38 @@ fi
 
 # ---- Delete ALB rules ----
 if [[ -s "$STATE_DIR/$IID.rules" ]]; then
-  while read -r RARN; do [[ -n "$RARN" ]] && aws elbv2 delete-rule --region "$REGION" --rule-arn "$RARN" || true; done < "$STATE_DIR/$IID.rules"
+  while read -r RARN; do
+    if [[ -n "$RARN" ]]; then
+      run_safe aws elbv2 delete-rule --region "$REGION" --rule-arn "$RARN" || true
+    fi
+  done < "$STATE_DIR/$IID.rules"
 else
   if [[ -n "$TG_ARN" && "$TG_ARN" != "None" && -n "$ALB_ARN" && "$ALB_ARN" != "None" ]]; then
-    LISTENERS=$(aws elbv2 describe-listeners --region "$REGION" --load-balancer-arn "$ALB_ARN" --query 'Listeners[].ListenerArn' --output text)
-    for L in $LISTENERS; do
-      R=$(aws elbv2 describe-rules --region "$REGION" --listener-arn "$L" \
-        | jq -r --arg fqdn "$FQDN" '.Rules[] | select(.Conditions[]? | select(.Field=="host-header") | .HostHeaderConfig.Values | index($fqdn)) | .RuleArn')
-      for RARN in $R; do aws elbv2 delete-rule --region "$REGION" --rule-arn "$RARN" || true; done
-    done
+    if run_safe aws elbv2 describe-listeners --region "$REGION" --load-balancer-arn "$ALB_ARN" --query 'Listeners[].ListenerArn' --output text > /tmp/listeners.txt; then
+      while read -r L; do
+        if [[ -n "$L" ]]; then
+          if run_safe aws elbv2 describe-rules --region "$REGION" --listener-arn "$L" > /tmp/cleanup_rules.json; then
+            R=$(jq -r --arg fqdn "$FQDN" '.Rules[] | select(.Conditions[]? | select(.Field=="host-header") | .HostHeaderConfig.Values | index($fqdn)) | .RuleArn' /tmp/cleanup_rules.json)
+            for RARN in $R; do
+              if [[ -n "$RARN" ]]; then
+                run_safe aws elbv2 delete-rule --region "$REGION" --rule-arn "$RARN" || true
+              fi
+            done
+          else
+            log_error "Failed to describe rules for listener $L during cleanup"
+          fi
+        fi
+      done < /tmp/listeners.txt
+    else
+      log_error "Failed to describe listeners for ALB $ALB_ARN during cleanup"
+    fi
   fi
 fi
 
 # ---- Deregister & delete TG ----
 if [[ -n "$TG_ARN" && "$TG_ARN" != "None" ]]; then
-  aws elbv2 deregister-targets --region "$REGION" --target-group-arn "$TG_ARN" --targets "Id=$IID" || true
-  aws elbv2 delete-target-group --region "$REGION" --target-group-arn "$TG_ARN" || true
+  run_safe aws elbv2 deregister-targets --region "$REGION" --target-group-arn "$TG_ARN" --targets "Id=$IID" || true
+  run_safe aws elbv2 delete-target-group --region "$REGION" --target-group-arn "$TG_ARN" || true
 fi
 
 # ---- Remove dual‑zone DNS ----
@@ -111,7 +142,7 @@ JSON
   if [[ -n "${PRIV6:-}" ]]; then
     jq --arg n "$FQDN" --arg v "$PRIV6" '.Changes += [{"Action":"DELETE","ResourceRecordSet":{"Name":$n,"Type":"AAAA","TTL":60,"ResourceRecords":[{"Value":$v}]}}]' "$DEL_PRIV" > "$DEL_PRIV.2" && mv "$DEL_PRIV.2" "$DEL_PRIV"
   fi
-  aws route53 change-resource-record-sets --hosted-zone-id "$PRIVATE_ZONE_ID" --change-batch "file://$DEL_PRIV" || true
+  run_safe aws route53 change-resource-record-sets --hosted-zone-id "$PRIVATE_ZONE_ID" --change-batch "file://$DEL_PRIV" || true
 fi
 
 # Cleanup state
