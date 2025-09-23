@@ -778,6 +778,26 @@
       "listPush",
       "global/server_groups",
       {
+        "id": "padevworkers",
+        "title": "padev Workers",
+        "regexp": "padev.xyz",
+        "manager": 0
+      }
+    ],
+    [
+      "listPush",
+      "global/server_groups",
+      {
+        "id": "privateautoworkers",
+        "title": "privateauto Workers",
+        "regexp": "privateauto.com",
+        "manager": 0
+      }
+    ],
+    [
+      "listPush",
+      "global/server_groups",
+      {
         "id": "managergrp",
         "title": "Managers",
         "regexp": "manager",
