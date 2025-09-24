@@ -12,7 +12,7 @@ check_existing_manager() {
         echo "Checking for existing servers in storage..."
 
         # Get the list of servers from storage
-        local servers_json=$(node "$HOMEDIR/bin/storage-cli.js" get global/servers 2>/dev/null)
+        local servers_json=$(node "$HOMEDIR/bin/storage-cli.js" get global/servers/0 2>/dev/null)
 
         if [ $? -ne 0 ] || [ -z "$servers_json" ] || [ "$servers_json" = "null" ]; then
             echo "No servers found in storage or storage not accessible"

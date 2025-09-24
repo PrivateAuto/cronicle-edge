@@ -269,25 +269,25 @@ stream.on('json', async (job) => {
     logAppend(job, `[Cronicle Batch] Verifying package file: ${stats.size} bytes`);
 
     if (fileExtension === '.zip') {
-      // Extract zip file with better error handling
+      // Extract zip file respecting stored file paths
       await new Promise((resolve, reject) => {
         fs.createReadStream(packageFilePath)
-        .pipe(unzipper.Extract({ 
-          path: workDir,
-          preservePath: true // Preserve full directory paths from the zip file
-        }))   
+        .pipe(unzipper.Extract({
+          path: workDir
+          // Remove preservePath - let unzipper handle paths as stored in zip
+        }))
           .on('error', reject)
           .on('close', resolve)
           .on('finish', resolve);
       });
       logAppend(job, `[Cronicle Batch] Extracted ZIP package into ${workDir}`);
     } else {
-      // Extract tar.gz file
+      // Extract tar.gz file respecting stored file paths
       await tar.x({
         file: packageFilePath,
         cwd: workDir,
-        strip: 0, // Don't strip any leading path components
-        preservePaths: true // Preserve full directory paths
+        strip: 0 // Don't strip any leading path components
+        // Remove preservePaths - let tar handle paths as stored in archive
       });
       logAppend(job, `[Cronicle Batch] Extracted TAR package into ${workDir}`);
     }
