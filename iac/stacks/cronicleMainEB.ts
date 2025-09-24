@@ -129,7 +129,7 @@ export async function cronicleMainEB(ctx: StackContext, vpcName: string = VPC_NA
     environment: {
       TZ: "America/Chicago",
       // EFS_ID: fileSystem.fileSystemId,
-      DOMAIN: "batch.paops.xyz",
+      DOMAIN: 'batch.' + config.domain,
       PRIVATE_ZONE_ID: "Z02458833BN9S7SLE8J71",
       PUBLIC_ZONE_ID: "Z01514342XRAVNZ06MTDD",
       NAME_MODE: "id", // id or ip

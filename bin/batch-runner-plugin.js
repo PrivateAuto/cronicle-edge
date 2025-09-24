@@ -272,7 +272,10 @@ stream.on('json', async (job) => {
       // Extract zip file with better error handling
       await new Promise((resolve, reject) => {
         fs.createReadStream(packageFilePath)
-          .pipe(unzipper.Extract({ path: workDir }))
+        .pipe(unzipper.Extract({ 
+          path: workDir,
+          preservePath: true // Preserve full directory paths from the zip file
+        }))   
           .on('error', reject)
           .on('close', resolve)
           .on('finish', resolve);
@@ -282,7 +285,9 @@ stream.on('json', async (job) => {
       // Extract tar.gz file
       await tar.x({
         file: packageFilePath,
-        cwd: workDir
+        cwd: workDir,
+        strip: 0, // Don't strip any leading path components
+        preservePaths: true // Preserve full directory paths
       });
       logAppend(job, `[Cronicle Batch] Extracted TAR package into ${workDir}`);
     }
