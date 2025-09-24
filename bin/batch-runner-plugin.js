@@ -269,16 +269,45 @@ stream.on('json', async (job) => {
     logAppend(job, `[Cronicle Batch] Verifying package file: ${stats.size} bytes`);
 
     if (fileExtension === '.zip') {
-      // Extract zip file respecting stored file paths
+      // Extract zip file respecting stored file paths and ensuring all files are extracted
       await new Promise((resolve, reject) => {
+        const pendingWrites = [];
+
         fs.createReadStream(packageFilePath)
-        .pipe(unzipper.Extract({
-          path: workDir
-          // Remove preservePath - let unzipper handle paths as stored in zip
-        }))
-          .on('error', reject)
-          .on('close', resolve)
-          .on('finish', resolve);
+        .pipe(unzipper.Parse())
+        .on('entry', (entry) => {
+          const fileName = entry.path;
+          const type = entry.type;
+          const fullPath = path.join(workDir, fileName);
+
+          if (type === 'Directory') {
+            fs.mkdirSync(fullPath, { recursive: true });
+            entry.autodrain();
+          } else {
+            // Ensure directory exists
+            fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+
+            // Track each file write operation
+            const writePromise = new Promise((writeResolve, writeReject) => {
+              const writeStream = fs.createWriteStream(fullPath);
+              writeStream.on('finish', writeResolve);
+              writeStream.on('error', writeReject);
+              entry.pipe(writeStream);
+            });
+
+            pendingWrites.push(writePromise);
+          }
+        })
+        .on('error', reject)
+        .on('close', async () => {
+          try {
+            // Wait for all file writes to complete
+            await Promise.all(pendingWrites);
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        });
       });
       logAppend(job, `[Cronicle Batch] Extracted ZIP package into ${workDir}`);
     } else {
