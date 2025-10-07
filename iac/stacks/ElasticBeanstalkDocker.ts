@@ -15,7 +15,7 @@ import { mapToCfnOptions, makeEBInstanceRole } from "./eb-utils";
 import { IApplicationLoadBalancer } from "aws-cdk-lib/aws-elasticloadbalancingv2";
 import { CfnInstanceProfile } from "aws-cdk-lib/aws-iam";
 
-const STAGES = {
+const STAGES: Record<string, Record<string, any>> = {
   paops: {
     name: "ops",
     env: {
@@ -65,11 +65,8 @@ export interface EBProps {
   port?: string;
   domain?: string;
   region: string;
-  // sourcePath: string;
-  // versionId: string;
   instanceType: string;
   vpc: string | IVpc;
-  // vpcSubnets: SubnetSelection;
   securityGroups: ISecurityGroup[];
   solutionStackName?: string;
   instanceRole?: IRole | Role;
@@ -105,11 +102,11 @@ const DEFAULTS: Partial<EBProps> = {
 };
 
 export class ElasticBeanstalkDocker extends Construct {
-  public url: string;
-  public asset: string;
-  public app: eb.CfnApplication;
-  public env: eb.CfnEnvironment;
-  public ver: eb.CfnApplicationVersion;
+  public url?: string;
+  public asset?: string;
+  public app?: eb.CfnApplication;
+  public env?: eb.CfnEnvironment;
+  public ver?: eb.CfnApplicationVersion;
 
   private constructor(scope: Construct, appName: string, props: EBProps) {
     super(scope, appName);
@@ -120,9 +117,9 @@ export class ElasticBeanstalkDocker extends Construct {
     appName: string,
     propsIn: EBProps
   ): Promise<ElasticBeanstalkDocker> {
-    const stageValues = STAGES[propsIn.stage];
-    console.log(`stage: ${propsIn.stage}`);
-    console.log(`stageValues: ${JSON.stringify(stageValues)}`);
+    const stageValues: any = STAGES[propsIn.stage];
+    // console.log(`stage: ${propsIn.stage}`);
+    // console.log(`stageValues: ${JSON.stringify(stageValues)}`);
     const props: EBProps = {
       ...DEFAULTS,
       domain: stageValues.domain,
@@ -164,6 +161,7 @@ export class ElasticBeanstalkDocker extends Construct {
 
     const policies = [
       "pa-apiBasicAccess-policy",
+      "pa-s3ReadOnlyAccess-policy",
       "pa-s3FullAccess-policy",
       "pa-ssmAccess-policy",
     ];
@@ -215,39 +213,11 @@ export class ElasticBeanstalkDocker extends Construct {
       props.instanceInlinePolicies ?? []
     );
 
-    // Determine the absolute path to the source directory
-    /*
-    const versionKey = `${appName}-${path.basename(props.sourcePath)}-${
-      props.versionId
-    }`;
-    //console.log(`versionKey: ${versionKey}`);
-    //console.log(`name: ${appName}`);
-    const zip = makeZipFile(versionKey, props.sourcePath);
-    const { bucket: s3Bucket, key: s3Key } = await uploadFileToS3(
-      zip,
-      `${appName}/${path.basename(zip)}`,
-      stageValues.uploadBucket
-    );
-
-    // console.log(`Uploaded ${zip}`);
-    console.log(`s3://[${s3Bucket}]/[${s3Key}] - ${versionKey}`);
-
-    const appVersion = new eb.CfnApplicationVersion(scope, versionKey, {
-      applicationName: app.applicationName ?? appName,
-      description: versionKey,
-      sourceBundle: {
-        s3Bucket,
-        s3Key,
-      },
-    });
-    appVersion.cfnOptions.deletionPolicy = cdk.CfnDeletionPolicy.RETAIN;
-    */
-
     const publicSubnets = vpc?.publicSubnets
-      ?.map((s) => s.subnetId)
+      ?.map((s:any) => s.subnetId)
       ?.join(", ");
     const privateSubnets = vpc?.privateSubnets
-      ?.map((s) => s.subnetId)
+      ?.map((s:any) => s.subnetId)
       ?.join(", ");
 
     const options = {

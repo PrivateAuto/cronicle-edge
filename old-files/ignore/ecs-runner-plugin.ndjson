@@ -1,0 +1,50 @@
+{
+    "id": "aws-ecs",
+    "title": "AWS ECS Runner",
+    "enabled": 1,
+    "command": "/opt/cronicle/plugins/ecs-runner-plugin.js",
+    "params": [
+        { "id": "aws_region",                 "title": "AWS Region",                        "type": "text", "placeholder": "us-east-1" },
+        { "id": "ecs_cluster",                "title": "ECS Cluster ARN/Name",              "type": "text" },
+        { "id": "launch_type",                "title": "Launch Type",                       "type": "menu", "items": ["FARGATE","EC2"], "default": "FARGATE" },
+        { "id": "mode",                       "title": "Task Mode",                         "type": "menu", "items": ["task_definition","image"], "default": "task_definition" },
+
+        { "id": "task_definition",            "title": "Task Definition (ARN/family:rev)",  "type": "text" },
+        { "id": "family",                     "title": "Family (image mode)",               "type": "text", "default": "cronicle-ecs-runner" },
+        { "id": "container_name",             "title": "Container Name",                    "type": "text", "default": "app" },
+        { "id": "image",                      "title": "Docker Image (image mode)",         "type": "text", "placeholder": "public.ecr.aws/xyz/myimage:tag" },
+        { "id": "cpu",                        "title": "CPU units (Fargate)",               "type": "text", "placeholder": "256" },
+        { "id": "memory",                     "title": "Memory (MiB, Fargate)",             "type": "text", "placeholder": "512" },
+        { "id": "task_role_arn",              "title": "Task Role ARN",                     "type": "text" },
+        { "id": "execution_role_arn",         "title": "Execution Role ARN",                "type": "text" },
+
+        { "id": "subnets",                    "title": "Subnets (comma-separated)",         "type": "text" },
+        { "id": "security_groups",            "title": "Security Groups (comma-separated)", "type": "text" },
+        { "id": "assign_public_ip",           "title": "Assign Public IP",                  "type": "menu", "items": ["ENABLED","DISABLED"], "default": "DISABLED" },
+        { "id": "platform_version",           "title": "Platform Version",                  "type": "text", "placeholder": "LATEST" },
+        { "id": "propagate_tags",             "title": "Propagate Tags",                    "type": "menu", "items": ["","TASK_DEFINITION","SERVICE"], "default": "" },
+
+        { "id": "command",                    "title": "Container Command",                 "type": "text", "placeholder": "python app.py --flag" },
+        { "id": "environment",                "title": "Env (KEY=VAL, comma-separated)",    "type": "text", "placeholder": "FOO=bar,BAZ=qux" },
+        { "id": "secrets",                    "title": "Secrets (KEY=arn|ssm:...)",         "type": "text", "placeholder": "DB_URI=arn:aws:secretsmanager:...:secret:mydb" },
+
+        { "id": "tail_logs",                  "title": "Fetch Logs After Run",              "type": "checkbox", "default": 1 },
+        { "id": "cw_log_group",               "title": "Log Group (awslogs)",               "type": "text", "placeholder": "/ecs/my-group" },
+        { "id": "cw_log_stream_prefix",       "title": "Log Stream Prefix",                 "type": "text", "default": "ecs" },
+        { "id": "log_fetch_limit",            "title": "Post-run Log Fetch Limit",          "type": "text", "default": "1000" },
+
+        { "id": "stream_logs_live",           "title": "Stream Logs Live (CW)",             "type": "checkbox", "default": 0 },
+        { "id": "stream_log_start_from_head", "title": "Live: Start From Head",             "type": "checkbox", "default": 0 },
+        { "id": "stream_log_poll_interval_sec","title": "Live: Poll Interval (sec)",        "type": "text", "default": "3" },
+        { "id": "log_include_regex",          "title": "Log Include Regex",                 "type": "text", "placeholder": "ERROR|WARN" },
+        { "id": "log_exclude_regex",          "title": "Log Exclude Regex",                 "type": "text", "placeholder": "DEBUG" },
+
+        { "id": "wait_timeout_sec",           "title": "Wait Timeout (sec)",                "type": "text", "default": "1800" },
+        { "id": "wait_poll_interval_sec",     "title": "Poll Interval (sec)",               "type": "text", "default": "5" },
+        { "id": "keep_task_definition",       "title": "Keep Registered TD (image mode)",   "type": "checkbox", "default": 0 },
+
+        { "id": "aws_access_key_id",          "title": "AWS ACCESS KEY (optional)",         "type": "hidden" },
+        { "id": "aws_secret_access_key",      "title": "AWS SECRET KEY (optional)",         "type": "hidden" },
+        { "id": "aws_session_token",          "title": "AWS SESSION TOKEN (optional)",      "type": "hidden" }
+    ]
+}

@@ -1,0 +1,6 @@
+{
+    "id": "maingrp",
+    "title": "Primary Group",
+    "regexp": ".+",
+    "master": 1
+}

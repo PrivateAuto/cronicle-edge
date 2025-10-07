@@ -1,0 +1,75 @@
+{
+    "testCases": [
+      {
+        "name": "batch-test",
+        "params": {
+          "name": "batch-test",
+          "version": "1.0.0",
+          "environment": "padev",
+          "command": "echo 'hello world'"
+        },
+        "description": "Test basic plugin execution with no parameters"
+      },
+      {
+        "name": "basic-execution",
+        "params": {},
+        "description": "Test basic plugin execution with no parameters"
+      },
+      {
+        "name": "with-target-env",
+        "params": {
+          "target": "padev"
+        },
+        "description": "Test with target environment parameter"
+      },
+      {
+        "name": "with-inline-script",
+        "params": {
+          "target": "padev",
+          "inline_script": "db.collection('test').find().limit(1)",
+          "quiet": true
+        },
+        "description": "Test with inline MongoDB script"
+      },
+      {
+        "name": "with-extra-args",
+        "params": {
+          "target": "privateauto",
+          "extra_args": "--eval 'printjson({test: true})'",
+          "quiet": false
+        },
+        "description": "Test with extra mongosh arguments"
+      },
+      {
+        "name": "invalid-target",
+        "params": {
+          "target": "invalid_env"
+        },
+        "description": "Test error handling with invalid target environment",
+        "expectFailure": true
+      },
+      {
+        "name": "large-script",
+        "params": {
+          "target": "padev",
+          "inline_script": "// This is a longer script\nfor (let i = 0; i < 10; i++) {\n  print('Iteration: ' + i);\n}",
+          "quiet": false
+        },
+        "description": "Test with a larger inline script"
+      }
+    ],
+    "globalSettings": {
+      "timeout": 45000,
+      "retries": 1,
+      "environment": {
+        "NODE_ENV": "test",
+        "MONGO_TEST_MODE": "true"
+      }
+    },
+    "assertions": {
+      "checkExitCode": true,
+      "checkStdoutContains": [],
+      "checkStderrEmpty": true,
+      "maxExecutionTime": 30000
+    }
+  }

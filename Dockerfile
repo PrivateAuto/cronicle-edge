@@ -66,7 +66,7 @@ RUN case "${TARGETPLATFORM}" in \
   && curl https://downloads.mongodb.com/compass/mongodb-mongosh_2.4.2_${MONGOSHARCH}.deb -o mongodb-mongosh_2.4.2_${MONGOSHARCH}.deb \
   && dpkg -i mongodb-mongosh_2.4.2_${MONGOSHARCH}.deb && rm mongodb-mongosh_2.4.2_${MONGOSHARCH}.deb
 
-RUN npm i -g typescript tsx sst@2 node-gyp pm2 ts-node
+RUN npm i -g typescript tsx sst@2 node-gyp pm2 ts-node aws-iot-device-sdk
 
 
 COPY . /opt/build
@@ -98,6 +98,17 @@ WORKDIR /opt/cronicle
 
 # protect sensitive folders
 RUN  mkdir -p /opt/cronicle/data /opt/cronicle/conf && chmod 0700 /opt/cronicle/data /opt/cronicle/conf
+
+
+RUN sh -c 'echo "Node: $(node -v)"' > ver.txt \
+  && echo "npm: $(npm -v)" >> ver.txt \
+  && echo "aws: $(aws --version)" >> ver.txt \
+  && echo "python3: $(python3 -V)" >> ver.txt \
+  && echo "python: $(python -V)" >> ver.txt \
+  && echo "mongosh: $(mongosh --version)" >> ver.txt \
+  && echo "mongo tools: $(mongoimport --version)" >> ver.txt
+
+
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 
