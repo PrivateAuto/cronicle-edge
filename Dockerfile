@@ -92,12 +92,16 @@ RUN groupadd --gid $CRONICLE_GID cronicle || true \
 ENV PATH="/opt/cronicle/bin:${PATH}"
 ENV CRONICLE_foreground=1
 ENV CRONICLE_echo=1
-ENV TZ=America/Chicago 
+ENV TZ=America/Chicago
+ENV TMPDIR=/opt/cronicle-data/tmp
 
-WORKDIR /opt/cronicle 
+WORKDIR /opt/cronicle
 
-# protect sensitive folders
-RUN  mkdir -p /opt/cronicle/data /opt/cronicle/conf && chmod 0700 /opt/cronicle/data /opt/cronicle/conf
+# protect sensitive folders and create data directories
+RUN  mkdir -p /opt/cronicle/data /opt/cronicle/conf && chmod 0700 /opt/cronicle/data /opt/cronicle/conf \
+  && mkdir -p /opt/cronicle-data/logs /opt/cronicle-data/logs/jobs /opt/cronicle-data/queue /opt/cronicle-data/tmp \
+  && chown -R cronicle:cronicle /opt/cronicle-data \
+  && chmod -R 0755 /opt/cronicle-data
 
 RUN sh -c 'echo "Node: $(node -v)"' > ver.txt \
   && echo "npm: $(npm -v)" >> ver.txt \

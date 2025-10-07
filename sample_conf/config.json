@@ -9,7 +9,7 @@
   "secret_key": "ssm://cronicle/secret_key",
   "ad_domain": "corp.cronicle.com",
 
-  "log_dir": "logs",
+  "log_dir": "/opt/cronicle-data/logs",
   "log_filename": "[component].log",
   "log_columns": [
     "hires_epoch",
@@ -22,11 +22,11 @@
     "msg",
     "data"
   ],
-  "log_archive_path": "logs/archives/[yyyy]/[mm]/[dd]/[filename]-[yyyy]-[mm]-[dd].log.gz",
+  "log_archive_path": "/opt/cronicle-data/logs/archives/[yyyy]/[mm]/[dd]/[filename]-[yyyy]-[mm]-[dd].log.gz",
   "log_crashes": true,
-  "pid_file": "logs/cronicled.pid",
+  "pid_file": "/opt/cronicle-data/logs/cronicled.pid",
   "copy_job_logs_to": "",
-  "queue_dir": "queue",
+  "queue_dir": "/opt/cronicle-data/queue",
   "debug_level": 5,
   "maintenance": "04:00",
   "list_row_max": 10000,

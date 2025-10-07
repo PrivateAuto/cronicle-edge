@@ -1,6 +1,6 @@
 services:
   cronicle:
-    image: 173305588364.dkr.ecr.us-east-2.amazonaws.com/cronicle:$TAG
+    image: 173305588364.dkr.ecr.us-east-2.amazonaws.com/cronicle:${TAG}
     restart: always
     network_mode: host
     environment:
