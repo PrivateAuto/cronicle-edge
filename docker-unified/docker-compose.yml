@@ -36,5 +36,5 @@ volumes:
   efs-data:
     driver_opts:
       type: nfs
-      o: addr=${EFS_ID}.efs.us-east-2.amazonaws.com,rw,nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+      o: addr=${EFS_ID:-not-set}.efs.us-east-2.amazonaws.com,rw,nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
       device: :/
