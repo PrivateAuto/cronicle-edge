@@ -136,8 +136,7 @@ jobs:
           export TAG="${{ env.VER }}"
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
           echo "TAG: $TAG"
-          [ -f docker-compose.yml ] && cp docker-compose.yml tmp && sed "s/\${TAG}/$TAG/g"
-            < tmp > docker-compose.yml
+          [ -f docker-compose.yml ] && cp docker-compose.yml tmp && sed "s/\${TAG}/$TAG/g" < tmp > docker-compose.yml
           [ -f docker-compose.yml ] && head docker-compose.yml
           zip -r0v9 ${ASSET} $FILES
 
