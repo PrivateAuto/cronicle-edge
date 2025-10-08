@@ -135,10 +135,10 @@ jobs:
           ASSET="${{ env.PROJECT_NAME }}-${{ env.VER }}.zip"
           export TAG="${{ env.VER }}"
           FILES=`cat package.json | jq -r .files | grep -v "]" | grep -v "\[" | sed 's/,//g' | sed 's/\"//g'`
-          cd docker-unified
           echo "TAG: $TAG"
           [ -f docker-compose.yml ] && cp docker-compose.yml tmp && sed 's/\${TAG}/${VERSION}/g' < tmp > docker-compose.yml
-          zip -r0v9 ../${ASSET} $FILES
+          [ -f docker-compose.yml ] && head docker-compose.yml
+          zip -r0v9 ${ASSET} $FILES
 
       - name: Publish Release files
         # if: github.ref_name == github.event.repository.default_branch
@@ -166,7 +166,7 @@ jobs:
         id: deploy-padev
         uses: ./.github/actions/deploy-eb
         with:
-          aws-region: ${{ inputs.region }}
+          aws-region: ${{ inputs.region }} 
           app-name: cronicle-app
           s3-bucket: 'pa-build-cache-ops'
           package-name: ${{ env.PROJECT_NAME }}

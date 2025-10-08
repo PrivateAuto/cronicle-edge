@@ -91,13 +91,8 @@ export interface EBProps {
 }
 
 const DEFAULTS: Partial<EBProps> = {
-  dockerComposeFile: "docker-compose.yml",
-  dockerPath: "docker-unified", // Contains platform hooks that handle DNS/ALB failures gracefully
-  //subdomain: ["workflow"],
   pathPatterns: ["*"],
   networkName: "pa-net-vpc",
-  serviceRoleName: "",
-  instanceProfileName: "aws-elasticbeanstalk-ec2-role",
   port: "80",
 };
 

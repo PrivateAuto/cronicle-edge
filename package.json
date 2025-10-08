@@ -17,19 +17,6 @@
 		"boot": "pixl-boot install",
 		"unboot": "pixl-boot uninstall"
 	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cronicle-edge/cronicle-edge"
-	},
-	"bugs": {
-		"url": "https://github.com/cronicle-edge/cronicle-edge/issues"
-	},
-	"keywords": [
-		"cron",
-		"crontab",
-		"scheduler",
-		"Orchestra"
-	],
 	"dependencies": {
 		"@aws-sdk/client-codeartifact": "^3.888.0",
 		"@aws-sdk/client-ssm": "^3.891.0",
