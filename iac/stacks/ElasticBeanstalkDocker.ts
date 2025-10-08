@@ -264,7 +264,7 @@ export class ElasticBeanstalkDocker extends Construct {
           environment: {
             LoadBalancerType: "application",
             LoadBalancerIsShared: "true",
-            ServiceRole: props.serviceRoleName,
+            ServiceRole: props.serviceRoleName ?? serviceRole.roleName,
             process: {
               default: {
                 HealthCheckPath: "/",

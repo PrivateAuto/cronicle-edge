@@ -10,12 +10,12 @@ services:
       - TZ=${TZ:-America/Chicago}
 
       - CRONICLE_base_app_url=${CRONICLE_base_app_url}
-      - CRONICLE_SERVER_GROUP=${CRONICLE_SERVER_GROUP}
-      - CRONICLE_ENVIRONMENT=${CRONICLE_ENVIRONMENT}
-      - WORKER_ENVIRONMENT=${WORKER_ENVIRONMENT}
-      - CRONICLE_CLUSTER_ROLE=${CRONICLE_CLUSTER_ROLE}
-      - CRONICLE_server_comm_use_hostnames=${CRONICLE_server_comm_use_hostnames}
-      - CRONICLE_web_direct_connect=${CRONICLE_web_direct_connect}
+      # - CRONICLE_SERVER_GROUP=${CRONICLE_SERVER_GROUP}
+      # - CRONICLE_ENVIRONMENT=${CRONICLE_ENVIRONMENT}
+      # - WORKER_ENVIRONMENT=${WORKER_ENVIRONMENT}
+      # - CRONICLE_CLUSTER_ROLE=${CRONICLE_CLUSTER_ROLE}
+      - CRONICLE_server_comm_use_hostnames=${CRONICLE_server_comm_use_hostnames:-true}
+      - CRONICLE_web_direct_connect=${CRONICLE_web_direct_connect:-true}
 
       - CRONICLE_WebServer__http_port=80
 
