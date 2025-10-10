@@ -29,9 +29,11 @@ process.stdout.setEncoding('utf8');
 const stream = new JSONStream(process.stdin, process.stdout);
 
 stream.on('json', function (job) {
-	// got job from parent 
+	// got job from parent
 
-	let script_file = path.join(os.tmpdir(), 'cronicle-script-temp-' + job.id + '.sh');	
+	// Try to use TMPDIR env var, fallback to system temp
+	const temp_dir = process.env.TMPDIR || os.tmpdir();
+	let script_file = path.join(temp_dir, 'cronicle-script-temp-' + job.id + '.sh');	
 
 	// attach "files" as env variables
 	if(Array.isArray(job.files)) {
@@ -60,7 +62,7 @@ stream.on('json', function (job) {
 
 	if (os.platform() == 'win32') { // if Windows - try to parse shebang or invoke as bat file
 		let fl = script.substring(0, script.indexOf("\n")).trim()
-		script_file = path.join(os.tmpdir(), 'cronicle-script-temp-' + job.id + '.ps1')
+		script_file = path.join(temp_dir, 'cronicle-script-temp-' + job.id + '.ps1')
 
 		// if script contains shebang, resolve interpreter from there
 		if (fl.startsWith("#!")) {
@@ -89,8 +91,47 @@ stream.on('json', function (job) {
 			child_exec = script_file
 		}
 	}
-	
-	fs.writeFileSync(script_file, script, { mode: "775" });
+
+	// Try to write script file with error handling
+	try {
+		fs.writeFileSync(script_file, script, { mode: "775" });
+	} catch (err) {
+		// If permission denied, try fallback locations
+		const fallback_paths = ['/tmp', '/var/tmp', os.tmpdir()];
+		let written = false;
+
+		for (const fallback_dir of fallback_paths) {
+			if (fallback_dir === temp_dir) continue; // already tried
+
+			try {
+				script_file = path.join(fallback_dir, 'cronicle-script-temp-' + job.id + '.sh');
+				fs.writeFileSync(script_file, script, { mode: "775" });
+
+				// Update child execution path
+				if (!job.tty) {
+					child_exec = script_file;
+				} else {
+					child_args = ["-qec", script_file, "--flush", "/dev/null"];
+				}
+
+				written = true;
+				break;
+			} catch (fallbackErr) {
+				continue;
+			}
+		}
+
+		if (!written) {
+			stream.write({
+				complete: 1,
+				code: 1,
+				description: "Permission denied: Cannot write to temp directory (" + temp_dir + "). Original error: " + err.message,
+				html: 0
+			});
+			return;
+		}
+	}
+
 	const child = cp.spawn(child_exec, child_args, {stdio: ['pipe', 'pipe', 'pipe']});
 
 	let kill_timer = null;

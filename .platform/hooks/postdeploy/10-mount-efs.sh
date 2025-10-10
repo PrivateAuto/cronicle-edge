@@ -39,6 +39,6 @@ fi
 # Create subdirectories with proper permissions
 mkdir -p "$MOUNT_POINT/logs" "$MOUNT_POINT/logs/jobs" "$MOUNT_POINT/queue" "$MOUNT_POINT/tmp"
 chown -R 2000:2099 "$MOUNT_POINT"
-chmod -R 0755 "$MOUNT_POINT"
+chmod -R 0775 "$MOUNT_POINT"
 
 echo "EFS mount complete and directories created"
