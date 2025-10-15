@@ -121,21 +121,68 @@ stream.on('json', async (job) => {
 
   // 1) Assume IAM role
   let assumedRole;
+  let refreshCredentials;
+
+  // Function to assume the role and return credentials
+  const assumeRole = async () => {
+    try {
+      const sts = new STSClient({
+        region: process.env.AWS_REGION || DEFAULT_REGION
+      });
+
+      const resp = await sts.send(new AssumeRoleCommand({
+        RoleArn: ROLE_MAP[environment],
+        RoleSessionName: `cronicle-batch-${job.id}`
+      }));
+      if (!resp.Credentials) throw new Error("No credentials returned from STS");
+      return resp.Credentials;
+    } catch (e) {
+      throw new Error(`AssumeRole failed: ${e.message}`);
+    }
+  };
+
+  // Function to check if credentials need refresh (refresh 5 minutes before expiration)
+  const needsRefresh = (credentials) => {
+    if (!credentials || !credentials.Expiration) return true;
+    const expirationTime = new Date(credentials.Expiration).getTime();
+    const currentTime = Date.now();
+    const fiveMinutesInMs = 5 * 60 * 1000;
+    return (expirationTime - currentTime) < fiveMinutesInMs;
+  };
+
+  // Initial role assumption
   try {
-    const sts = new STSClient({
-      region: process.env.AWS_REGION || DEFAULT_REGION
-    });
-    
-    const resp = await sts.send(new AssumeRoleCommand({
-      RoleArn: ROLE_MAP[environment],
-      RoleSessionName: `cronicle-batch-${job.id}`
-    }));
-    if (!resp.Credentials) throw new Error("No credentials returned from STS");
-    assumedRole = resp.Credentials;
-    logAppend(job, `[Cronicle Batch] Assumed IAM role: ${ROLE_MAP[environment]}`);
+    assumedRole = await assumeRole();
+    logAppend(job, `[Cronicle Batch] Assumed IAM role: ${ROLE_MAP[environment]} (expires: ${assumedRole.Expiration.toISOString()})`);
   } catch (e) {
-    return failWithCleanup(job, `AssumeRole failed: ${e.message}`, workDir);
+    return failWithCleanup(job, e.message, workDir);
   }
+
+  // Function to refresh credentials and update child process environment
+  refreshCredentials = async (child) => {
+    if (needsRefresh(assumedRole)) {
+      try {
+        const newCreds = await assumeRole();
+        assumedRole = newCreds;
+        logAppend(job, `[Cronicle Batch] Refreshed AWS credentials (expires: ${assumedRole.Expiration.toISOString()})`);
+
+        // Update child process environment if it exists
+        if (child && child.pid) {
+          child.env = {
+            ...child.env,
+            AWS_ACCESS_KEY_ID: assumedRole.AccessKeyId,
+            AWS_SECRET_ACCESS_KEY: assumedRole.SecretAccessKey,
+            AWS_SESSION_TOKEN: assumedRole.SessionToken
+          };
+        }
+        return true;
+      } catch (e) {
+        logAppend(job, `[Cronicle Batch] Warning: Failed to refresh credentials: ${e.message}`);
+        return false;
+      }
+    }
+    return true;
+  };
 
 
   // 2) Get authorization token for CodeArtifact
@@ -352,6 +399,7 @@ ${script}
   };
 
   let killTimer = null;
+  let credRefreshTimer = null;
   let stderrBuffer = "";
   let sentHtml = false;
 
@@ -360,6 +408,15 @@ ${script}
     env: childEnv,
     stdio: ['pipe', 'pipe', 'pipe']
   });
+
+  // Start periodic credential refresh check (every 2 minutes)
+  credRefreshTimer = setInterval(async () => {
+    try {
+      await refreshCredentials(child);
+    } catch (e) {
+      logAppend(job, `[Cronicle Batch] Credential refresh check failed: ${e.message}`);
+    }
+  }, 2 * 60 * 1000);
 
   // Child output handling (mirror shell-plugin behavior)
   const cstream = new JSONStream(child.stdout, child.stdin);
@@ -410,6 +467,7 @@ ${script}
 
   child.on('exit', async (code, signal) => {
     if (killTimer) clearTimeout(killTimer);
+    if (credRefreshTimer) clearInterval(credRefreshTimer);
     code = (code || signal || 0);
 
     const data = {
@@ -438,6 +496,7 @@ ${script}
   // Graceful shutdown hook
   process.on('SIGTERM', () => {
     logAppend(job, `Caught SIGTERM, terminating child: ${child.pid}`);
+    if (credRefreshTimer) clearInterval(credRefreshTimer);
     killTimer = setTimeout(() => {
       logAppend(job, `Child did not exit, sending SIGKILL: ${child.pid}`);
       try { child.kill('SIGKILL'); } catch (e) {}
