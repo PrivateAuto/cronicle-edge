@@ -95,7 +95,13 @@ stream.on('json', async (job) => {
   const name = String(params.name || '').trim();
   const version = String(params.version || '').trim();
   const environment = String(params.environment || '').trim();
-  const script = String(params.script || '');
+  // Preserve original script without modifying whitespace - handle various line ending formats
+  let script = params.script || '';
+  if (typeof script !== 'string') {
+    script = String(script);
+  }
+  // Normalize line endings to \n but preserve all other whitespace
+  script = script.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const annotate = Boolean(params.annotate);
 
   if (!name) return failWithCleanup(job, "Missing required parameter name", null);
@@ -376,6 +382,7 @@ stream.on('json', async (job) => {
 
   try {
     // Create script file with proper bash header and the user's script
+    // Script content is preserved exactly as provided, with each line processed normally by bash
     const scriptContent = `#!/bin/bash
 set -e  # Exit on error
 set -u  # Exit on undefined variable
@@ -385,8 +392,17 @@ set -o pipefail  # Exit on pipe failure
 ${script}
 `;
 
-    fs.writeFileSync(scriptPath, scriptContent, { mode: 0o755 });
-    logAppend(job, `[Cronicle Batch] Created script file: ${path.basename(scriptPath)}`);
+    // Write script file with Unix line endings
+    fs.writeFileSync(scriptPath, scriptContent, { mode: 0o755, encoding: 'utf8' });
+
+    // Log script preview (first 5 lines) for debugging
+    const scriptLines = script.split('\n');
+    const previewLines = scriptLines.slice(0, 5).map(line => `  ${line}`).join('\n');
+    const totalLines = scriptLines.length;
+    logAppend(job, `[Cronicle Batch] Created script file: ${path.basename(scriptPath)} (${totalLines} line${totalLines !== 1 ? 's' : ''})`);
+    if (totalLines > 0) {
+      logAppend(job, `[Cronicle Batch] Script preview (first ${Math.min(5, totalLines)} line${Math.min(5, totalLines) !== 1 ? 's' : ''}):\n${previewLines}${totalLines > 5 ? '\n  ...' : ''}`);
+    }
   } catch (e) {
     return failWithCleanup(job, `Failed to create script file: ${e.message}`, workDir);
   }
