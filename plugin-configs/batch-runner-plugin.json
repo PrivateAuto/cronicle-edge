@@ -30,10 +30,11 @@
     {
       "id": "script",
       "title": "Script",
-      "type": "text",
-      "multi": 1,
+      "type": "textarea",
       "required": 1,
-      "placeholder": "#!/bin/bash\necho 'Starting batch job...'\n# Your multiline bash script here"
+      "rows": 10,
+      "placeholder": "#!/bin/bash\necho 'Starting batch job...'\n# Your multiline bash script here",
+      "description": "Bash script to execute (preserves newlines and formatting)"
     },
     {
       "id": "annotate",

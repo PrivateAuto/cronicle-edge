@@ -95,11 +95,24 @@ stream.on('json', async (job) => {
   const name = String(params.name || '').trim();
   const version = String(params.version || '').trim();
   const environment = String(params.environment || '').trim();
+
   // Preserve original script without modifying whitespace - handle various line ending formats
   let script = params.script || '';
   if (typeof script !== 'string') {
     script = String(script);
   }
+
+  // Check if script was base64 encoded (for reliable newline preservation)
+  // If the script starts with 'base64:' prefix, decode it
+  if (script.startsWith('base64:')) {
+    try {
+      script = Buffer.from(script.substring(7), 'base64').toString('utf8');
+    } catch (e) {
+      // If decoding fails, use the script as-is (minus the prefix)
+      script = script.substring(7);
+    }
+  }
+
   // Normalize line endings to \n but preserve all other whitespace
   script = script.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
   const annotate = Boolean(params.annotate);
